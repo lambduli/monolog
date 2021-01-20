@@ -1,77 +1,72 @@
 # frozen_string_literal: true
 
-require_relative './token.rb'
-require_relative './ast.rb'
+require_relative './token'
+require_relative './ast'
 
-
-
+# Parser of the language
 class Parser
-
   def initialize(lexer)
     @lexer = lexer
   end
 
-  def parse
-    lex = @lexer.clone
+  def execute
+    r = first_of(
+      [method(:parse_rule),
+       method(:parse_variable),
+       method(:parse_literal),
+       method(:parse_atom)],
+      'not a valid term'
+    )
 
-    begin
-      # axiom/fact
-      # predicate, query
-      r = parse_rule
-      if @lexer.has_next?
-        raise 'not a valid rule - there`s something extra'
-      end
-      return r
-    rescue => e
-      @lexer = lex.clone
-    end
+    raise 'not a valid term - there`s something extra' if @lexer.has_next?
 
-    begin
-      v = parse_variable
-      if @lexer.has_next?
-        raise 'not a valid variable - there`s something extra'
-      end
-      return v
-    rescue => e
-      @lexer = lex.clone
-    end
-
-    begin
-      l = parse_literal
-      if @lexer.has_next?
-        raise 'not a valid literal - there`s something extra'
-      end
-      return l
-    rescue => _e
-      @lexer = lex.clone
-    end
-
-    begin
-      a = parse_atom
-      if @lexer.has_next?
-        raise 'not a valid atom - there`s something extra'
-      end
-      return a
-    rescue => _e
-      @lexer = lex.clone
-    end
-
-    raise 'failed to parse the term'
+    r
   end
 
   private
 
-  # OK
-  def parse_rule
-    # axiom/fact | lowerIdent ( ...pattern ) .
-    # predicate | lowerIdent ( ...pattern ) :- pattern... .
-    # first parse axiom minus dot           OK
-    # then try to parse . --> return fact   OK
-    # if that fails try to parse :- --> try to parse rule's body including dot        OK
-    # if that fails raise         OK
-
+  # this one propagates the parsing failure
+  def do_parse(&block)
     lex = @lexer.clone
 
+    begin
+      block.call
+    rescue => e
+      @lexer = lex.clone
+      raise e
+    end
+  end
+
+  # this one never fails - if it cannot parse, it just restores the lexer state
+  def try_parse(&block)
+    lex = @lexer.clone
+
+    begin
+      block.call
+    rescue => _e
+      @lexer = lex.clone
+    end
+  end
+
+  def first_of(parsers, message)
+    parsers.each do |parser|
+      begin
+        return do_parse { parser.call }
+      rescue => _e
+        next
+      end
+    end
+
+    raise message
+  end
+
+  # axiom/fact | lowerIdent ( ...pattern ) .
+  # predicate | lowerIdent ( ...pattern ) :- pattern... .
+  # first parse axiom minus dot           OK
+  # then try to parse . --> return fact   OK
+  # if that fails try to parse :- --> try to parse rule's body including dot        OK
+  # if that fails raise         OK
+  def parse_rule
     begin
       f = parse_predicate
     rescue => _e
@@ -79,9 +74,8 @@ class Parser
     end
 
     tok = @lexer.next_token
-    if tok.instance_of? Dot
-      return Fact.new(f.name, f.arguments)
-    end
+
+    return Fact.new(f.name, f.arguments) if tok.instance_of? Dot
 
     if tok.instance_of? If
       begin
@@ -105,24 +99,16 @@ class Parser
     parts = []
 
     while true do
-      lex = @lexer.clone
-
-      begin
+      try_parse do
         f = parse_predicate
         parts << f
-      rescue => _e
-        @lexer = lex.clone
       end
 
       tok = @lexer.next_token
 
-      if tok.instance_of? Comma
-        next
-      end
+      next if tok.instance_of? Comma
 
-      if tok.instance_of? Dot
-        break
-      end
+      break if tok.instance_of? Dot
 
       raise 'not a rule - incorrect body'
     end
@@ -130,120 +116,80 @@ class Parser
     parts.reduce { |left, right| Conjunction.new(left, right)}
   end
 
-  # OK
   def parse_variable
     tok = @lexer.next_token
 
-    if tok.instance_of? Upper_Identifier
-      Var.new(tok.str)
-    else
-      raise 'not a variable'
-    end
+    return Var.new(tok.str) if tok.instance_of? Upper_Identifier
+
+    raise 'not a variable'
   end
 
-  # OK
   def parse_atom
     tok = @lexer.next_token
 
-    if tok.instance_of? Lower_Identifier
-      Atom.new(tok.str)
-    else
-      raise 'not a atom'
-    end
+    return Atom.new(tok.str) if tok.instance_of? Lower_Identifier
+
+    raise 'not a atom'
   end
 
-  # OK
   def parse_number
     tok = @lexer.next_token
 
-    if tok.instance_of? Numeral
-      Literal.new(tok.value)
-    else
-      raise 'not a number'
-    end
+    return NumLit.new(tok.value) if tok.instance_of? Numeral
+
+    raise 'not a number'
   end
 
-  # OK
   def parse_string
     tok = @lexer.next_token
 
-    if tok.instance_of? Text
-      Literal.new(tok.value)
-    else
-      raise 'not a string'
-    end
+    return TextLit.new(tok.value) if tok.instance_of? Text
+
+    raise 'not a string'
   end
 
   def parse_literal
-    lex = @lexer.clone
-
-    begin
-      n = parse_number
-      return n
-    rescue => _e
-      @lexer = lex.clone
-    end
-
-    begin
-      s = parse_string
-      return s
-    rescue => _e
-      @lexer = lex.clone
-    end
-
-    raise 'not a literal'
+    first_of(
+      [method(:parse_number),
+       method(:parse_string)],
+      'not a literal'
+    )
   end
 
-  # OK
   def parse_wild
     tok = @lexer.next_token
 
-    if tok.instance_of? Hole
-      Wildcard.new
-    else
-      raise 'not an wildcard'
-    end
+    return Wildcard.new if tok.instance_of? Hole
+
+    raise 'not an wildcard'
   end
 
-  # OK
   def parse_predicate
     # lowercase ( pattern , ... , pattern )
 
     tok = @lexer.next_token
 
-    if !tok.instance_of? Lower_Identifier
-      raise 'not a predicate - wrong predicate name'
-    end
+    raise 'not a predicate - wrong predicate name' unless tok.instance_of? Lower_Identifier
 
     name = tok.str
 
     tok = @lexer.next_token
 
-    if !tok.instance_of? Open_Paren
-      raise 'not a predicate - missing opening paren'
-    end
+    raise 'not a predicate - missing opening paren' unless tok.instance_of? Open_Paren
 
     patterns = []
 
-    while true do
-      lex = @lexer.clone
-
-      begin
+    while true
+      try_parse do
         p = parse_pattern
         patterns << p
-      rescue => _e
-        @lexer = lex.clone
       end
 
       tok = @lexer.next_token
 
-      if tok.instance_of? Comma
-        next
-      end
+      next if tok.instance_of? Comma
 
-      if tok.instance_of? Close_Paren
-        break
-      end
+      break if tok.instance_of? Close_Paren
 
       raise 'not a predicate - possibly missing comma after argument or missing closing parenthesis'
     end
@@ -251,52 +197,14 @@ class Parser
     Predicate.new(name, patterns)
   end
 
-  # OK
   def parse_pattern
-    lex = @lexer.clone
-
-    # predicate
-    begin
-      p = parse_predicate
-      return p
-    rescue => _e
-      @lexer = lex.clone
-    end
-
-    # _
-    begin
-      w = parse_wild
-      return w
-    rescue => _e
-      @lexer = lex.clone
-    end
-
-    # atom
-    begin
-      a = parse_atom
-      return a
-    rescue => _e
-      @lexer = lex.clone
-    end
-
-    # literal
-    begin
-      l = parse_literal
-      return l
-    rescue => _e
-      @lexer = lex.clone
-    end
-
-    # variable
-    begin
-      v = parse_variable
-      return v
-    rescue => _e
-      @lexer = lex.clone
-    end
-
-    # nebo list destructuring -- later
-
-    raise 'not a pattern'
+    first_of(
+      [method(:parse_predicate),
+       method(:parse_wild),
+       method(:parse_atom),
+       method(:parse_literal),
+       method(:parse_variable)],
+      'not a pattern'
+    )
   end
 end
