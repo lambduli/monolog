@@ -62,6 +62,10 @@ class Fact < Functor
   def dup
     Fact.new(@name, @args.map { |arg| arg.dup })
   end
+
+  def ==(other)
+    other.instance_of?(Fact) && @name == other.name && @arguments == other.arguments
+  end
 end
 
 # consists of predicate (head + body) and conjunction ~~or~~disjunctions~~
@@ -95,6 +99,10 @@ class Rule < AST
   def dup
     Rule.new(@name, @arguments.dup, @body.dup)
   end
+
+  def ==(other)
+    other.instance_of?(Rule) && @arguments == other.arguments && @body == other.body
+  end
 end
 
 # atoms are special terms
@@ -111,6 +119,10 @@ class Atom < AST
 
   def dup
     Atom.new(@value)
+  end
+
+  def ==(other)
+    other.instance_of?(Atom) && @value == other.value
   end
 end
 
@@ -208,6 +220,10 @@ class Wildcard < AST
   def dup
     Wildcard.new
   end
+
+  def ==(other)
+    other.instance_of?(Wildcard)
+  end
 end
 
 # TODO: implement later
@@ -226,6 +242,10 @@ class Predicate < Functor
 
   def dup
     Predicate.new(@name, @args.map{ |arg| arg.dup })
+  end
+
+  def ==(other)
+    other.instance_of?(Predicate) && @name == other.name && @arguments == other.arguments
   end
 end
 
@@ -256,6 +276,10 @@ class Conjunction < AST
 
   def dup
     Conjunction.new(@left.dup, @right.dup)
+  end
+
+  def ==(other)
+    other.instance_of?(Conjunction) && @left == other.left && @right == other.right
   end
 end
 
