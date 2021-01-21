@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require_relative './token.rb'
+require_relative './token'
 
-
+# Lexer of the language
 class Lexer
-
   def initialize(input)
     @input = input.chars
     @row = 0
@@ -19,7 +18,7 @@ class Lexer
   end
 
   def has_next?
-    @input.size != 0
+    !@input.empty?
   end
 
   def next_token
@@ -106,7 +105,7 @@ class Lexer
         @input = @input.drop 2
         r
       else
-        raise 'Invalid token at line ' + @row + ' column ' + @col
+        raise "Invalid token at line #{@row} column #{@col}"
       end
     else
       if char >= 'a' && char <= 'z'
@@ -119,7 +118,7 @@ class Lexer
         @col += 1
         readNumber(char)
       else
-        raise 'Unknown character ' + char + ' at line ' + @row + ' column ' + @col
+        raise "Unknown character #{char} at line #{@row} column #{@col}"
       end
     end
   end
@@ -127,9 +126,7 @@ class Lexer
   private
 
   def readLowerIdentifier(leading)
-    if @input.empty?
-      return Lower_Identifier.new(leading, @row, @col)
-    end
+    return Lower_Identifier.new(leading, @row, @col) if @input.empty?
 
     char, *@input = @input
 
@@ -137,24 +134,20 @@ class Lexer
     when ' '
       r = Lower_Identifier.new(leading, @row, @col)
       @col += 1
-      r
     else
       if (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z')
         r = readLowerIdentifier(leading + char)
         @col += 1
-        r
       else
         r = Lower_Identifier.new(leading, @row, @col)
-        @input = @input.prepend char
-        r
+        @input.prepend char
       end
     end
+    r
   end
 
   def readUpperIdentifier(leading)
-    if @input.empty?
-      return Upper_Identifier.new(leading, @row, @col)
-    end
+    return Upper_Identifier.new(leading, @row, @col) if @input.empty?
 
     char, *@input = @input
 
@@ -162,42 +155,35 @@ class Lexer
     when ' '
       r = Upper_Identifier.new(leading, @row, @col)
       @col += 1
-      r
     else
       if (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z')
         r = readUpperIdentifier(leading + char)
         @col += 1
-        r
       else
         r = Upper_Identifier.new(leading, @row, @col)
-        @input = @input.prepend char
-        r
+        @input.prepend char
       end
     end
+    r
   end
 
   def readNumber(leading)
-    if @input.empty?
-      return Numeral.new(leading.to_i, @row, @col)
-    end
+    return Numeral.new(leading.to_i, @row, @col) if @input.empty?
 
     char, *@input = @input
 
     if char >= '0' && char <= '9'
       r = readNumber(leading + char)
       @col += 1
-      r
     else
       r = Numeral.new(leading.to_i, @row, @col)
-      @input = @input.prepend char
-      r
+      @input.prepend char
     end
+    r
   end
 
   def readString
-    if @input.empty?
-      raise 'missing ending "'
-    end
+    raise 'missing ending "' if @input.empty?
 
     r = @row
     c = @col
@@ -208,19 +194,17 @@ class Lexer
     @col += 1
     chars = []
 
-    while char != '"' do
+    while char != '"'
       chars.append(char)
 
-      if @input.empty?
-        raise 'missing ending "'
-      end
+      raise 'missing ending "' if @input.empty?
+
       char, *@input = @input
       @col += 1
     end
 
     Text.new(chars.join(''), r, c)
   end
-
 
   protected
 
