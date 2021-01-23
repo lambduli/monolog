@@ -64,27 +64,27 @@ class Lexer
       r = Dot.new(@row, @col)
       @col += 1
       r
-    when '|'
-      r = Cons.new(@row, @col)
-      @col += 1
-      r
+    # when '|'
+    #   r = Cons.new(@row, @col)
+    #   @col += 1
+    #   r
 
-    when '+'
-      r = Operator.new(char, @row, @col)
-      @col += 1
-      r
-    when '-'
-      r = Operator.new(char, @row, @col)
-      @col += 1
-      r
-    when '*'
-      r = Operator.new(char, @row, @col)
-      @col += 1
-      r
-    when '/'
-      r = Operator.new(char, @row, @col)
-      @col += 1
-      r
+    # when '+'
+    #   r = Operator.new(char, @row, @col)
+    #   @col += 1
+    #   r
+    # when '-'
+    #   r = Operator.new(char, @row, @col)
+    #   @col += 1
+    #   r
+    # when '*'
+    #   r = Operator.new(char, @row, @col)
+    #   @col += 1
+    #   r
+    # when '/'
+    #   r = Operator.new(char, @row, @col)
+    #   @col += 1
+    #   r
     when '"'
       readString
 
