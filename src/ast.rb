@@ -24,6 +24,10 @@ class AST
     @@counter += 1
     old
   end
+
+  def specify(_context, _user_vars)
+    self
+  end
 end
 
 # general Functor term
@@ -61,6 +65,10 @@ class Fact < Functor
 
   def ==(other)
     other.instance_of?(Fact) && @name == other.name && @arguments == other.arguments
+  end
+
+  def specify(context, user_vars)
+    Fact.new(@name, @arguments.map { |arg| arg.specify(context, user_vars) })
   end
 end
 
@@ -201,6 +209,19 @@ class Var < AST
 
     @name == other.name
   end
+
+  def specify(context, user_vars)
+    bind = context.get(self)
+
+    case bind
+    when Assoc
+      bind.val.specify(context, user_vars)
+    when Fusassoc
+      bind.val.specify(context, user_vars)
+    when Fused
+      Var.new("_100#{bind.set.to_a[0].name.delete_prefix('_')}")
+    end
+  end
 end
 
 # _
@@ -234,6 +255,10 @@ class Predicate < Functor
 
   def ==(other)
     other.instance_of?(Predicate) && @name == other.name && @arguments == other.arguments
+  end
+
+  def specify(context, user_vars)
+    Predicate.new(@name, @arguments.map { |arg| arg.specify(context, user_vars) })
   end
 end
 
