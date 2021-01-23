@@ -36,13 +36,6 @@ def unify(left, right, base, context)
   if left == right
     return context
 
-  # # to unify two atoms
-  # elsif left.is_a?(Atom) && right.is_a?(Atom) && left.value == right.value
-  #   return context
-  # # to unify two literals
-  # elsif left.is_a?(Literal) && right.is_a?(Literal) && left.value == right.value
-  #   return context
-
   # unify wildcard with anything
   elsif left.is_a?(Wildcard) || right.is_a?(Wildcard)
     return context
@@ -145,29 +138,6 @@ def unify(left, right, base, context)
     right_val = context[right]
     return unify(left, right_val, base, context)
 
-  # Following code hase been fixed and replaced
-  # # to unify a fresh variable with anything - left
-  # elsif (left.is_a?(Var) && context.fresh?(left)) || (right.is_a?(Var) && context.fresh?(right))
-  #   # just the fact that one of them is a fresh variable
-  #   # should guarantee this won't fail
-  #   return context.bind(left, right)
-
-  # Following code hase been fixed and replaced - hopefuly
-  # to unify a Assoc, or Fusassoc Variable with a Functor
-  # left var
-  # elsif left.is_a?(Var) && context.has_value?(left) && right.is_a?(Functor)
-  #   return unify(context[left], right, base, context)
-  # # right var
-  # elsif right.is_a?(Var) && context.has_value?(right) && left.is_a?(Functor)
-  #   return unify(left, context[right], base, context)
-
-  # Following code hase been fixed and replaced - hopefuly
-  # to unify a variable with anything except struct
-  # elsif left.is_a?(Var)
-  #   return context.bind(left, right)
-  # elsif right.is_a?(Var)
-  #   return context.bind(right, left)
-
   # unify a functor with a Rule
   elsif left.is_a?(Functor) && right.is_a?(Rule)
     # first match the name
@@ -211,29 +181,8 @@ def unify(left, right, base, context)
     end
 
     return context
-
-  # to unify a Predicate with a Fact
-  # elsif left.is_a?(Predicate) && right.is_a?(Fact)
-  #   # both must have the same name
-  #   # both must have the same arity
-  #   # all corresponding positions must unify
-  #   if left.name != right.name
-  #     raise 'Cannot unify predicate and fact with different names.'
-  #   end
-  #   if left.arguments.length != right.arguments.length
-  #     raise 'Cannot unify predicate and fact with different arity.'
-  #   end
-
-  #   to_unify = left.arguments.zip(right.arguments)
-
-  #   to_unify.each do |l, r|
-  #     context = unify(l, r, base, context)
-  #   end
-
-  #   return context
   end
 
-  # to unify a Predicate with a Rule
   # puts "failed to unify #{left} with #{right}  in the context: #{context}"
   # puts 'neco jsem pokazil'
   # puts "left class #{left.class.name}  right class #{right.class.name}   left value #{left}   right value #{right}"
