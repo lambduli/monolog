@@ -17,7 +17,7 @@ def prove(term, base, context)
         # puts 'prove   ' + ctx.class.name
         # puts ' prove   pred: ' + pred.to_s
         return ctx
-      rescue => e
+      rescue => _e
         # TODO: do something?
         # puts "unification of \n    #{term}\n  with\n    #{pred}\n  FAILED"
         # puts e.to_s
