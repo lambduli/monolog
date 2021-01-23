@@ -11,8 +11,6 @@ class AST
     rename(mapping)
   end
 
-  # protected
-
   def vars
     []
   end
@@ -37,8 +35,6 @@ class Functor < AST
     @arguments = arguments
   end
 
-  # protected
-
   def vars
     @arguments.reduce([]) { |acc, arg| acc | arg.vars }
   end
@@ -52,7 +48,7 @@ end
 # a fact
 class Fact < Functor
   def to_s
-    @name + '(' + @arguments.join(', ') + ').'
+    "#{@name}(#{@arguments.join(', ')})."
   end
 
   def dup_with(name, args)
@@ -60,7 +56,7 @@ class Fact < Functor
   end
 
   def dup
-    Fact.new(@name, @args.map { |arg| arg.dup })
+    Fact.new(@name, @arguments.map { |arg| arg.dup })
   end
 
   def ==(other)
@@ -79,10 +75,8 @@ class Rule < AST
   end
 
   def to_s
-    @name + '(' + @arguments.join(', ') + ') :- ' + body.to_s + '.'
+    "@name (#{@arguments.join(', ')}) :- #{body}."
   end
-
-  # protected
 
   def vars
     arg_vars = @arguments.reduce([]) { |acc, arg| acc | arg.vars }
@@ -182,10 +176,8 @@ class Var < AST
   end
 
   def ==(other)
-    @name == other.name
+    other.instance_of?(Var) && @name == other.name
   end
-
-  # protected
 
   def vars
     [@name]
@@ -226,14 +218,10 @@ class Wildcard < AST
   end
 end
 
-# TODO: implement later
-# class ListPattern < Pattern
-# end
-
 # consists of name and list of patterns as arguments
 class Predicate < Functor
   def to_s
-    @name + '(' + @arguments.join(', ') + ')'
+    "#{@name}(#{@arguments.join(', ')})"
   end
 
   def dup_with(name, args)
@@ -241,7 +229,7 @@ class Predicate < Functor
   end
 
   def dup
-    Predicate.new(@name, @args.map{ |arg| arg.dup })
+    Predicate.new(@name, @arguments.map{ |arg| arg.dup })
   end
 
   def ==(other)
@@ -261,8 +249,6 @@ class Conjunction < AST
   def to_s
     "#{@left}, #{@right}"
   end
-
-  # protected
 
   def vars
     @left.vars + @right.vars
@@ -284,24 +270,33 @@ class Conjunction < AST
 end
 
 # _; _
-# class Disjunction < AST
-#   attr_accessor :left, :right
+class Disjunction < AST
+  attr_accessor :left, :right
 
-#   def initialize(left, right)
-#     super
-#     @left = left
-#     @right = right
-#   end
+  def initialize(left, right)
+    @left = left
+    @right = right
+  end
 
-#   def to_s
-#     @left.to_s + '; ' + @right.to_s
-#   end
-# end
+  def to_s
+    "#{@left}; #{@right}"
+  end
 
-# Var is 23
-# class Is_Unif < AST
-# end
+  def vars
+    @left.vars + @right.vars
+  end
 
-# class Operation < AST
+  def rename(mapping)
+    renamed_left = @left.rename(mapping)
+    renamed_right = @right.rename(mapping)
+    Disjunction.new(renamed_left, renamed_right)
+  end
 
-# end
+  def dup
+    Disjunction.new(@left.dup, @right.dup)
+  end
+
+  def ==(other)
+    other.instance_of?(Conjunction) && @left == other.left && @right == other.right
+  end
+end
