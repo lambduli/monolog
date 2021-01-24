@@ -131,10 +131,12 @@ class REPL
         vars = ast.vars
         puts "\n"
         contexts.each do |ctxt|
-          present(ctxt, vars)
+          lines = present(ctxt, vars)
+          puts '  True' if lines.zero?
+
           puts "\nor\n\n"
         end
-        puts "  False.\n"
+        puts "  False.\n\n"
           # puts context.to_s
         # rescue => e
           # puts '?????????????????????????????????????????'
@@ -155,6 +157,7 @@ class REPL
     var_set.each do |var|
       puts "  #{var} = #{Var.new(var).specify(context, var_set)}"
     end
+    var_set.length
   end
 end
 
