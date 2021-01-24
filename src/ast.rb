@@ -83,7 +83,7 @@ class Rule < AST
   end
 
   def to_s
-    "@name (#{@arguments.join(', ')}) :- #{body}."
+    "#{@name} (#{@arguments.join(', ')}) :- #{body}."
   end
 
   def vars
