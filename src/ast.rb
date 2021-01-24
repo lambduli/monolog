@@ -28,6 +28,10 @@ class AST
   def specify(_context, _user_vars)
     self
   end
+
+  def occurs(_var_set)
+    false
+  end
 end
 
 # general Functor term
@@ -46,6 +50,12 @@ class Functor < AST
   def rename(mapping)
     renamed_args = @arguments.map { |arg| arg.rename(mapping) }
     dup_with(@name, renamed_args)
+  end
+
+  def occurs(var_set)
+    @arguments.any? do |arg|
+      arg.occurs(var_set)
+    end
   end
 end
 
@@ -221,6 +231,10 @@ class Var < AST
     when Fused
       Var.new("_100#{bind.set.to_a[0].name.delete_prefix('_')}")
     end
+  end
+
+  def occurs(var_set)
+    var_set.include?(self)
   end
 end
 
