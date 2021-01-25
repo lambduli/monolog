@@ -27,6 +27,8 @@ class REPL
       '!- '
     when :reify
       '_- '
+    when :backtracking
+      '@- '
     else '> '
     end
   end
@@ -125,28 +127,56 @@ class REPL
 
       when :check
         ast = Predicate.new(ast.name, ast.arguments) if ast.instance_of? Fact
+        @mode = :backtracking
 
-        # begin
-        contexts = prove(ast, @knowledge_base, Context.new)
-        vars = ast.vars
+        # contexts = prove(ast, @knowledge_base, Context.new)
+        fiber = prove(ast, @knowledge_base, Context.new)
+        # ted je potreba ten fiber resumovat tak dlouho, dokud nevrati UnificationFail/False
+        # kdykoliv vrati context -> vyprezentuju ten context uzivateli
+        #     a cekam jestli uzivatel vlozi prikaz :next nebo :done
+        #     na :next pokracuju, na :done skoncim
+        # jakmile vrati False -> vypisu False. a skoncim
+
         puts "\n"
-        contexts.each do |ctxt|
-          lines = present(ctxt, vars)
-          puts '  True' if lines.zero?
+        vars = ast.vars
 
-          puts "\nor\n\n"
+        while true
+          unif_result = fiber.resume
+
+          case unif_result
+          when Context
+            ctx = unif_result
+
+            lines = present(ctx, vars)
+            puts '  True' if lines.zero?
+
+            puts "\n"
+            case read_command
+            when :next
+              puts "\n"
+              next
+            when :done
+              break
+            end
+
+            puts "\nor\n\n"
+          else
+            # puts unif_result.to_s
+            puts "  False.\n\n"
+            break
+          end
         end
-        puts "  False.\n\n"
-          # puts context.to_s
-        # rescue => e
-          # puts '?????????????????????????????????????????'
-          # puts 'doslo k exception? tak to je bad'
-          # puts e.to_s
-          # puts '?????????????????????????????????????????'
+        @mode = :check
 
-          # puts e.to_s
-          # puts "\n    False."
+        # vars = ast.vars
+        # puts "\n"
+        # contexts.each do |ctxt|
+        #   lines = present(ctxt, vars)
+        #   puts '  True' if lines.zero?
+
+        #   puts "\nor\n\n"
         # end
+        # puts "  False.\n\n"
       else
         puts 'Unknown mode!'
       end
@@ -158,6 +188,19 @@ class REPL
       puts "  #{var} = #{Var.new(var).specify(context, var_set)}"
     end
     var_set.length
+  end
+
+  def read_command
+    line = Readline.readline(prompt, true)
+
+    if line.start_with?(':n') || line.start_with?(':next')
+      :next
+    elsif line.start_with?(':d') || line.start_with?(':done')
+      :done
+    else
+      puts 'Unknown command, please repeat.'
+      read_command
+    end
   end
 end
 
