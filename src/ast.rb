@@ -29,7 +29,7 @@ class AST
     self
   end
 
-  def occurs(_var_set)
+  def occurs(_var_set, _context)
     false
   end
 end
@@ -52,9 +52,9 @@ class Functor < AST
     dup_with(@name, renamed_args)
   end
 
-  def occurs(var_set)
+  def occurs(var_set, context)
     @arguments.any? do |arg|
-      arg.occurs(var_set)
+      arg.occurs(var_set, context)
     end
   end
 end
@@ -233,8 +233,41 @@ class Var < AST
     end
   end
 
-  def occurs(var_set)
-    var_set.include?(self)
+  def occurs(var_set, context)
+    # if @name == '_7_R'
+    #   puts "\n"
+    #   puts "hele hele    self: #{self}   var_set: #{var_set}    context: #{context}"
+    #   puts "var_set.include?(self)  #{var_set.include?(self)}"
+    #   puts "pripadne context[self]   #{context[self]}"
+    #   puts "\n"
+    # end
+
+    # if @name == '_3_R'
+    #   puts "\n"
+    #   puts "hele hele    self: #{self}   var_set: #{var_set}    context: #{context}"
+    #   puts "var_set.include?(self)  #{var_set.include?(self)}"
+    #   puts "pripadne context[self]   #{context[self]}"
+    #   puts "\n"
+    # end
+
+    # puts "OCCURS check :::   #{self} . occurs ( #{var_set} , #{context}"
+    # navic potrebuju context argument
+    # a navic potrebuju checknout, jestli ta promenna, nema Assoc nebo Fusassoc nejakou hodnotu
+    # a pokud jo, tak tu hodnotu musim taky otestovat na .occurs na ten samej var_set
+    return true if var_set.include?(self)
+    # return false
+
+    # puts 'ask me'
+    # line = Readline.readline("sleduj\n", true)
+
+    maybe_val = context[self]
+    case maybe_val
+    when nil
+      false
+    else
+      val = maybe_val
+      val.occurs(var_set, context)
+    end
   end
 end
 
