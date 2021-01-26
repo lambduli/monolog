@@ -95,7 +95,7 @@ class REPL
       process_commands
 
       if @should_quit
-        puts 'Bye!'
+        puts "\nBye!"
         return
       end
 
