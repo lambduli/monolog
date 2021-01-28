@@ -111,7 +111,7 @@ What that means is you can load a fact like this one.
 one(X, s(X)).
 ```
 
-and test it, first with **strict occurs check enabled**
+And test it. First with **strict occurs check enabled**.
 ```prolog
 one(A, A).
 ```
@@ -135,7 +135,7 @@ We have all kinds of literals:
 
 Atoms are words which always start with a lower case letter.
 
-We also have variables like `A` or `B`. They start with upper case letter.
+We also have variables like `A` or `B`. They start with an upper case letter.
 
 We have facts:
 ```prolog
