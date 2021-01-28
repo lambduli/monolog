@@ -122,4 +122,44 @@ But when we disable the **strict occurs checking** we will get this extra answer
 ```prolog
   A = s(A)
 ```
-This is obviously incorrect and breaks all kinds of rules, but `SWIPL` defaults to that behaviour so `Monolog` offers it too.
+This is obviously incorrect and breaks all kinds of rules, but `SWIPL` defaults to that behaviour so `Monolog` offers it too. So should you enjoy your answers incorrect and recursive, `Monolog` got you covered.
+
+____
+
+## Short syntactic bootcamp *should you need it*
+
+We have all kinds of literals:
+- Strings like `"hello world"`
+- Numbers like `23`
+- Atoms like `peanut`
+
+Atoms are words which always start with a lower case letter.
+
+We also have variables like `A` or `B`. They start with upper case letter.
+
+We have facts:
+```prolog
+one(s(z)).
+```
+
+This makes the `one` a fact. It also means that `one` only accepts `s(z)` as an argument.
+
+For a fact to unify with a term they must have a same name, same number of arguments and values of arguments must unify with corresponding patterns in the definition of the fact.
+
+
+For anything more complicated we can use rules:
+```prolog
+even(s(N)) :- odd(N).
+```
+Here `even` is a rule. It has a **head** which is the name and list of arguments and a **body** which is made of `odd(N)` and ended with the dot symbol.
+
+For the rule to unify with a term they must have the same name, same number of arguments, arguments must unify with patterns in corresponding positions and a body must unify within the same context.
+
+
+To express that something should be true **AND** some other thing should be true also, we need to use the `conjunction`. Conjunction is written as `,` in the `Monolog` *same as in Prolog*. So we can do something like:
+```prolog
+longAndBlue(A) :- long(A), blue(A).
+```
+Assuming we define `long/1` and `blue/1` we can make something out of it.
+
+> Name of the predicate followed by the slash and a number is a convention in the Prolog to refer to that definition of the predicate of the given name, which has *that many* arguments.
