@@ -2,7 +2,7 @@
 
 require 'set'
 
-# represents abstract predecessor for Assoc and Fused and Fusassoc
+# represents an abstract predecessor for Assoc and Fused and Fusassoc
 class Bind
 end
 
@@ -209,7 +209,7 @@ class Context
     end
   end
 
-  # test's whether the var argument is associated with any value
+  # tests whether the var argument is associated with any value
   def has_value?(var)
     !self[var].nil?
   end
@@ -236,7 +236,7 @@ class Context
     var.is_a?(Var) && !key?(var)
   end
 
-  # tests whther the var argument is in the Assoc binding
+  # tests whether the var argument is in the Assoc binding
   def assocd?(var)
     return false if !var.instance_of?(Var) || fresh?(var)
 

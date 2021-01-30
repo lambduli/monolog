@@ -246,16 +246,8 @@ class Var < AST
       # puts "check occurs for #{self}   con #{context}   "
       var_set = bind.set.-([self])
       if bind.val.unsafe_occurs(var_set, context)
-        # puts "occurs check failed for #{self}   within #{context}   user_vars #{user_vars}"
-        # puts "inter   #{bind.set.&(user_vars)}"
-        # puts "maybe_bind.set.&(var_set.-([self]))"
-        # puts "#{context.get(self).set.&(var_set.-([self]))}"
-        # puts "context self set   #{context.get(self).set}"
-        # puts "a ta druha cast pruniku   #{(var_set.-([self]))}"
-
         inter = bind.set.&(user_vars)
         if user_vars.include?(self)
-          # puts "self #{self} je uvnitr user_vars #{user_vars}    within #{context}"
           return bind.val.specify(context, user_vars)
         elsif inter.empty?
           return self
@@ -271,31 +263,7 @@ class Var < AST
   end
 
   def occurs(var_set, context)
-    # if @name == '_7_R'
-    #   puts "\n"
-    #   puts "hele hele    self: #{self}   var_set: #{var_set}    context: #{context}"
-    #   puts "var_set.include?(self)  #{var_set.include?(self)}"
-    #   puts "pripadne context[self]   #{context[self]}"
-    #   puts "\n"
-    # end
-
-    # if @name == '_3_R'
-    #   puts "\n"
-    #   puts "hele hele    self: #{self}   var_set: #{var_set}    context: #{context}"
-    #   puts "var_set.include?(self)  #{var_set.include?(self)}"
-    #   puts "pripadne context[self]   #{context[self]}"
-    #   puts "\n"
-    # end
-
-    # puts "OCCURS check :::   #{self} . occurs ( #{var_set} , #{context}"
-    # navic potrebuju context argument
-    # a navic potrebuju checknout, jestli ta promenna, nema Assoc nebo Fusassoc nejakou hodnotu
-    # a pokud jo, tak tu hodnotu musim taky otestovat na .occurs na ten samej var_set
     return true if var_set.include?(self)
-    # return false
-
-    # puts 'ask me'
-    # line = Readline.readline("sleduj\n", true)
 
     maybe_val = context[self]
     case maybe_val
@@ -308,7 +276,7 @@ class Var < AST
   end
 
   # This method should only be used during specification of the term!
-  # occurs will can be used in unsafe way
+  # occurs can be used in an unsafe way
   # doing the occurs check while the context does already fails occurs check itself
   # I expect occurs check to fail only around Fusassoc
   def unsafe_occurs(var_set, context)

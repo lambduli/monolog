@@ -92,27 +92,7 @@ class Parser
 
   def parse_rule_body
     # it also parses the dot at the end
-    # sequence of Predicate, Is_Unif
-    # first version just conjunctions
-    # it can be either functor/predicate or IS arithmetic expression
-    # let's start with functors
 
-    # potrebuju naparsovat neco jako
-    # predicate , predicate , predicate ; predicate ; predicate
-    # takze prectu `predicate`, pak prectu logickou spojku a pak prectu `predicate`
-    # to mi da kompozitni `predicate`, pak teda musim precist spojku a zase predicate
-    # takze vlastne, ctu predikaty v cyklu
-    # pred cyklem prectu jeden predikat - protoze kazdy rule_body musi obsahovat aspon jeden predikat
-    # tim padem mam v `parts` uz jeden predikat
-    # v cyklu tim padem zacinam ctenim spojky
-    # pak prectu dalsi predikat a vznikne mi z toho novej prvek do parts
-    # vsechno ostatni z parts odstranim
-    # tim padem dalsi krok bude precist zase spojku a predikat
-    # navic kdykoliv ctu spojku, kdyz misto spojky prijde full stop `.`
-    # tak proste vratim co je uz v parts - mel by tam byt vdzycky jenom jeden prvek
-    # tim padem to nemusi byt pole ale staci promenna
-
-    # parts = []
     term = nil
     try_parse do
       term = parse_predicate
@@ -147,23 +127,6 @@ class Parser
     end
 
     term
-
-    # while true
-    #   try_parse do
-    #     f = parse_predicate
-    #     parts << f
-    #   end
-
-    #   tok = @lexer.next_token
-
-    #   next if tok.instance_of? Comma
-
-    #   break if tok.instance_of? Dot
-
-    #   raise 'not a rule - incorrect body'
-    # end
-
-    # parts.reduce { |left, right| Conjunction.new(left, right)}
   end
 
   def parse_variable
