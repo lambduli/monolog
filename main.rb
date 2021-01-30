@@ -194,6 +194,7 @@ class REPL
   def present(context, var_names)
     vars = var_names.map { |name| Var.new(name) }
     var_set = vars.to_set
+    written_lines = 0
     var_names.each do |varname|
       var = Var.new(varname)
       next if context.fresh?(var)
@@ -204,8 +205,9 @@ class REPL
         next unless var_set.include?(val)
       end
       puts "  #{varname} = #{var.specify(context, var_set)}"
+      written_lines += 1
     end
-    var_set.length
+    written_lines
   end
 
   def read_command
