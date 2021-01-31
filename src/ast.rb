@@ -243,7 +243,6 @@ class Var < AST
 
       bind.val.specify(context, user_vars)
     when Fusassoc
-      # puts "check occurs for #{self}   con #{context}   "
       var_set = bind.set.-([self])
       if bind.val.unsafe_occurs(var_set, context)
         inter = bind.set.&(user_vars)
@@ -258,8 +257,8 @@ class Var < AST
 
       bind.val.specify(context, user_vars)
     when Fused
-      # pokud existuje prunik fused (bez self) a user_vars
-      # chci vzit libovolnou promennou, ktera tomu odpovida
+      # if there's an intersection between fused.set (minus self) and user_vars
+      # I think it's safe to just return any variable from that intersection
       intersection = bind.set.-([self]).&(user_vars)
       if intersection.empty?
         Var.new("_100#{bind.set.to_a[0].name.delete_prefix('_')}")
