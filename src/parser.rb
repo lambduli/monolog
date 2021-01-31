@@ -172,7 +172,7 @@ class Parser
   def parse_wild
     tok = @lexer.next_token
 
-    return Wildcard.new if tok.instance_of? Hole
+    return Wildcard.new if tok.instance_of? Underscore
 
     raise 'not an wildcard'
   end
