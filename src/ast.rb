@@ -258,7 +258,14 @@ class Var < AST
 
       bind.val.specify(context, user_vars)
     when Fused
-      Var.new("_100#{bind.set.to_a[0].name.delete_prefix('_')}")
+      # pokud existuje prunik fused (bez self) a user_vars
+      # chci vzit libovolnou promennou, ktera tomu odpovida
+      intersection = bind.set.-([self]).&(user_vars)
+      if intersection.empty?
+        Var.new("_100#{bind.set.to_a[0].name.delete_prefix('_')}")
+      else
+        intersection.to_a[0]
+      end
     end
   end
 
