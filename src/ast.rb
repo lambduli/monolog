@@ -390,7 +390,7 @@ class Disjunction < AST
   end
 
   def to_s
-    "#{@left}; #{@right}"
+    "#{@left} ; #{@right}"
   end
 
   def vars
