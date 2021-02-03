@@ -24,6 +24,10 @@ class Assoc < Bind
   def dupl
     Assoc.new(@var.dup, @val.dup)
   end
+
+  def ==(other)
+    other.instance_of?(Assoc) && @var == other.var && @val == other.val
+  end
 end
 
 # represents the group of variables fused together
@@ -45,6 +49,10 @@ class Fused < Bind
     f.set = @set.dup
     f
   end
+
+  def ==(other)
+    other.instance_of?(Fused) && @set == other.set
+  end
 end
 
 # represents a group of variables fused together with the same associated value
@@ -63,6 +71,10 @@ class Fusassoc < Bind
 
   def dup
     Fusassoc.new(@set.dup, @val.dup)
+  end
+
+  def ==(other)
+    other.instance_of?(Fusassoc) && @val == other.val && @set == other.set
   end
 end
 
@@ -118,7 +130,7 @@ class Context
     fused = duplicate.get(var_fuse)
 
     fusassoc = Fusassoc.new(fused.set, val)
-    duplicate.remove(fused)
+    duplicate = duplicate.remove(fused)
     duplicate.arr.push(fusassoc)
     duplicate
   end
@@ -146,13 +158,13 @@ class Context
     case l_bind
     when Assoc
       duplicate.arr.push(Fusassoc.new([var_l, var_r], l_bind.val))
-      duplicate.remove(l_bind)
+      duplicate = duplicate.remove(l_bind)
     else
       r_bind = duplicate.get(var_r)
       case r_bind
       when Assoc
         duplicate.arr.push(Fusassoc.new([var_l, var_r], r_bind.val))
-        duplicate.remove(r_bind)
+        duplicate = duplicate.remove(r_bind)
       end
     end
 
@@ -168,8 +180,9 @@ class Context
     fusion_bind = duplicate.get(var_fused)
 
     fusassoc = Fusassoc.new(fusion_bind.set.add(var_assoc), assoc_bind.val)
-    duplicate.remove(assoc_bind)
-    duplicate.remove(fusion_bind)
+    duplicate = duplicate.remove(assoc_bind)
+    # fusion_bind = duplicate.get(var_fused) # just trying
+    duplicate = duplicate.remove(fusion_bind)
     duplicate.arr.push(fusassoc)
     duplicate
   end
@@ -182,7 +195,7 @@ class Context
     fusassocd = duplicate.get(var_fusassocd)
 
     fusassocd.set.merge(fused.set)
-    duplicate.remove(fused)
+    duplicate = duplicate.remove(fused)
     duplicate
   end
 
@@ -194,8 +207,9 @@ class Context
     right_bind = duplicate.get(var_right)
 
     merged = left_bind.set.merge(right_bind.set)
-    duplicate.remove(left_bind)
-    duplicate.remove(right_bind)
+    duplicate = duplicate.remove(left_bind)
+    # right_bind = duplicate.get(var_right)  # just trying
+    duplicate = duplicate.remove(right_bind)
     duplicate.arr.push(Fused.new(merged))
     duplicate
   end
