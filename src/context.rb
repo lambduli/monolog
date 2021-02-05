@@ -181,7 +181,6 @@ class Context
 
     fusassoc = Fusassoc.new(fusion_bind.set.add(var_assoc), assoc_bind.val)
     duplicate = duplicate.remove(assoc_bind)
-    # fusion_bind = duplicate.get(var_fused) # just trying
     duplicate = duplicate.remove(fusion_bind)
     duplicate.arr.push(fusassoc)
     duplicate
@@ -208,7 +207,6 @@ class Context
 
     merged = left_bind.set.merge(right_bind.set)
     duplicate = duplicate.remove(left_bind)
-    # right_bind = duplicate.get(var_right)  # just trying
     duplicate = duplicate.remove(right_bind)
     duplicate.arr.push(Fused.new(merged))
     duplicate
