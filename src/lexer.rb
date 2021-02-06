@@ -88,16 +88,16 @@ class Lexer
     when '"'
       readString
 
-    when 'i'
-      if @input[0] == 's' && @input[1] == ' '
-        r = Is.new(@row, @col)
-        @col += 3
-        @input = @input.drop 2
-        r
-      else
-        @col += 1
-        readLowerIdentifier('i')
-      end
+    # when 'i'
+    #   if @input[0] == 's' && @input[1] == ' '
+    #     r = Is.new(@row, @col)
+    #     @col += 3
+    #     @input = @input.drop 2
+    #     r
+    #   else
+    #     @col += 1
+    #     readLowerIdentifier('i')
+    #   end
     when ':'
       if @input[0] == '-' && @input[1] == ' '
         r = If.new(@row, @col)
