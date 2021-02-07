@@ -97,7 +97,7 @@ class Dot < Token
 end
 
 # |
-class Cons < Token
+class Pipe < Token
   attr_accessor :row, :column
 
   def initialize(row, column)
