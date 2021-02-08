@@ -135,7 +135,7 @@ class Context
     duplicate
   end
 
-  def add2fusassoc(var_l, var_r)
+  def add_to_fusassoc(var_l, var_r)
     duplicate = dup
     l_bind = duplicate.get(var_l)
     case l_bind
@@ -151,7 +151,7 @@ class Context
     duplicate
   end
 
-  def assoc2fusassociate(var_l, var_r)
+  def assoc_to_fusassociate(var_l, var_r)
     # finds the one in Assoc and creates Fusassoc + removes the Assoc
     duplicate = dup
     l_bind = duplicate.get(var_l)

@@ -124,12 +124,12 @@ class Evaluator
       elsif context.fresh?(left) && context.assocd?(right)
         unifail if @occurs && context[right].occurs([left].to_set, context)
 
-        single(context.assoc2fusassociate(right, left))
+        single(context.assoc_to_fusassociate(right, left))
       # oposite side
       elsif context.fresh?(right) && context.assocd?(left)
         unifail if @occurs && context[left].occurs([right].to_set, context)
 
-        single(context.assoc2fusassociate(left, right))
+        single(context.assoc_to_fusassociate(left, right))
 
       # unify fresh var and one fused
       # one side
@@ -144,12 +144,12 @@ class Evaluator
       elsif context.fresh?(left) && context.fusassocd?(right)
         unifail if @occurs && context[right].occurs([left].to_set, context)
 
-        single(context.add2fusassoc(right, left))
+        single(context.add_to_fusassoc(right, left))
       # opposite side
       elsif context.fresh?(right) && context.fusassocd?(left)
         unifail if @occurs && context[left].occurs([right].to_set, context)
 
-        single(context.add2fusassoc(left, right))
+        single(context.add_to_fusassoc(left, right))
 
       # unify a fresh var and non var value
       # one side
