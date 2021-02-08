@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 
 require_relative './token'
-require_relative './ast'
+require_relative './ast/ast'
+require_relative './ast/atom'
+require_relative './ast/functor'
+require_relative './ast/junction'
+require_relative './ast/literal'
+require_relative './ast/var'
+require_relative './ast/wildcard'
 
 # Parser of the language
 class Parser
