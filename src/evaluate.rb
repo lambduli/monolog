@@ -2,7 +2,7 @@
 
 require 'set'
 require 'fiber'
-require_relative './context'
+require_relative './context/context'
 
 # represents a negative result of the Prove/Unify operation
 class UnificationFailure

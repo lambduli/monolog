@@ -2,7 +2,6 @@
 
 require 'set'
 
-require_relative '../context'
 require_relative './ast'
 
 # atoms are special terms

@@ -2,8 +2,6 @@
 
 require 'set'
 
-require_relative '../context'
-
 # general AST
 class AST
   @@counter = 0
