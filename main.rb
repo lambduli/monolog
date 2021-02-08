@@ -5,15 +5,9 @@ require 'set'
 
 require_relative './src/token'
 require_relative './src/ast/functor'
-# require_relative './src/ast'
-# require_relative './src/ast'
-# require_relative './src/ast'
-# require_relative './src/ast'
-# require_relative './src/ast'
-
 require_relative './src/lexer'
 require_relative './src/parser'
-require_relative './src/context'
+require_relative './src/context/context'
 require_relative './src/evaluate'
 
 # REPL
