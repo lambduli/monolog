@@ -8,6 +8,7 @@ require_relative './ast/junction'
 require_relative './ast/literal'
 require_relative './ast/var'
 require_relative './ast/wildcard'
+require_relative './ast/negation'
 
 # Parser of the language
 class Parser
@@ -220,16 +221,12 @@ class Parser
     tok = @lexer.next_token
 
     if tok.instance_of?(SlashPlus)
-      inside = nil
-
-      try_parse do
-        inside = first_of(
-          [method(:parse_predicate),
-           method(:parse_variable),
-           method(:parse_negation)],
-          'not a valid term'
-        )
-      end
+      inside = first_of(
+        [method(:parse_predicate),
+          method(:parse_variable),
+          method(:parse_negation)],
+        'not a valid term'
+      )
 
       return Negation.new(inside)
     end
