@@ -81,6 +81,15 @@ class Lexer
       else
         raise "Invalid token at line #{@row} column #{@col}"
       end
+    when '\\'
+      if @input[0] == '+' && @input[1] == ' '
+        r = SlashPlus(@row, @col)
+        @col += 3
+        @input = @input.drop 2
+        r
+      else
+        raise "Invalid token at line #{@row} column #{@col}"
+      end
     else
       if char >= 'a' && char <= 'z'
         @col += 1
