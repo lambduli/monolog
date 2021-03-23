@@ -147,3 +147,13 @@ class Underscore < Token
     @column = column
   end
 end
+
+# \+
+class SlashPlus < Token
+  attr_accessor :row, :column
+
+  def initialize(row, column)
+    @row = row
+    @column = column
+  end
+end
