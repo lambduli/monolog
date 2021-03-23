@@ -83,7 +83,7 @@ class Lexer
       end
     when '\\'
       if @input[0] == '+' && @input[1] == ' '
-        r = SlashPlus(@row, @col)
+        r = SlashPlus.new(@row, @col)
         @col += 3
         @input = @input.drop 2
         r
