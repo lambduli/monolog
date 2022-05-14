@@ -138,7 +138,7 @@ class Context
     duplicate
   end
 
-  # if the var argument is not a Variable or a fresh one -> nil
+  # if the var argument is not a Variable or is afresh one -> nil
   # otherwise it looks up its binding and returns the associated value or nil (in case of Fused)
   def [](var)
     return nil if fresh?(var)
