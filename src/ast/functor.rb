@@ -58,7 +58,7 @@ class Fact < Functor
   end
 end
 
-# consists of predicate (head + body) and conjunction ~~or~~disjunctions~~
+# consists of head and body
 class Rule < AST
   attr_accessor :name, :arguments, :body
 
