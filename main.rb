@@ -17,6 +17,7 @@ class REPL
     @should_quit = false
     @should_skip = false
     @line = nil
+    @evaluator = Evaluator.new(true)
   end
 
   def prompt
@@ -36,6 +37,11 @@ class REPL
   def process_commands
     if @line.start_with?(':quit') || @line.start_with?(':q')
       @should_quit = true
+
+    elsif @line.start_with?(':o') || @line.start_with?(':occurs')
+      @evaluator.occurs = !@evaluator.occurs
+      puts "Strict occurs check #{@evaluator.occurs ? 'enabled' : 'disabled'}."
+      @should_skip = true
 
     # reify the term
     elsif @line.start_with?(':reify') || @line.start_with?(':r')
@@ -85,6 +91,7 @@ class REPL
     puts ':show      to show the whole knowledge base'
     puts ':clear     to clear the whole knowledge base'
     puts ':(r)eify   to reify every variable in the given term with unique prefix'
+    puts ':(o)ccurs  to enable/disable strict occurs checking'
     puts ':(q)uit    to quit the repl'
     puts ''
     # input = 'isSmall(X, _, small(some(atom, [1 | T]))) :- someMagic(X, V), E is [2 | 3 | [23]] ; other(V, E).'
@@ -130,7 +137,7 @@ class REPL
         @mode = :backtracking
 
         # contexts = prove(ast, @knowledge_base, Context.new)
-        fiber = prove(ast, @knowledge_base, Context.new)
+        fiber = @evaluator.prove(ast, @knowledge_base, Context.new)
         # ted je potreba ten fiber resumovat tak dlouho, dokud nevrati UnificationFail/False
         # kdykoliv vrati context -> vyprezentuju ten context uzivateli
         #     a cekam jestli uzivatel vlozi prikaz :next nebo :done
