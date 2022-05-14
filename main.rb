@@ -128,14 +128,23 @@ class REPL
 
         begin
           context = prove(ast, @knowledge_base, Context.new)
+          vars = ast.vars
           puts "\n"
-          puts context.to_s
+          present(context, vars)
+          # puts context.to_s
         rescue => _e
+          # puts e.to_s
           puts "\n    False."
         end
       else
         puts 'unknown mode'
       end
+    end
+  end
+
+  def present(context, var_set)
+    var_set.each do |var|
+      puts "  #{var} = #{Var.new(var).specify(context, var_set)}"
     end
   end
 end
