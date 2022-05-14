@@ -126,18 +126,27 @@ class REPL
       when :check
         ast = Predicate.new(ast.name, ast.arguments) if ast.instance_of? Fact
 
-        begin
-          context = prove(ast, @knowledge_base, Context.new)
-          vars = ast.vars
-          puts "\n"
-          present(context, vars)
-          # puts context.to_s
-        rescue => _e
-          # puts e.to_s
-          puts "\n    False."
+        # begin
+        contexts = prove(ast, @knowledge_base, Context.new)
+        vars = ast.vars
+        puts "\n"
+        contexts.each do |ctxt|
+          present(ctxt, vars)
+          puts "\nor\n\n"
         end
+        puts '  False.'
+          # puts context.to_s
+        # rescue => e
+          # puts '?????????????????????????????????????????'
+          # puts 'doslo k exception? tak to je bad'
+          # puts e.to_s
+          # puts '?????????????????????????????????????????'
+
+          # puts e.to_s
+          # puts "\n    False."
+        # end
       else
-        puts 'unknown mode'
+        puts 'Unknown mode!'
       end
     end
   end
