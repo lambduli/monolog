@@ -72,19 +72,64 @@ class REPL
       @mode = :store
       @should_skip = true
 
-    # export the base to the .pl file
+    # export the base to the file
     elsif @line.start_with?(':export') || @line.start_with?(':e')
       @should_skip = true
       filename = @line.delete_prefix(':export').delete_prefix(':e').strip
+
       if filename.empty?
         puts 'You must specify a file name for the base to be exported to!'
         return
       end
+
       # serialize and store the base
       content = @knowledge_base.map do |member|
         "#{member}\n"
       end.join
       File.open(filename, 'a') { |file| file.write(content) }
+
+    # import the base from the file
+    elsif @line.start_with?(':import') || @line.start_with?(':i')
+      @should_skip = true
+      filename = @line.delete_prefix(':import').delete_prefix(':i').strip
+
+      if filename.empty?
+        puts 'You must specify a file name which should be imported!'
+        return
+      end
+
+      unless File.exist?(filename)
+        puts "The file `#{filename}` does not exist!"
+        return
+      end
+
+      base = []
+      transaction_ok = true
+
+      File.foreach(filename) do |line|
+        lexer = Lexer.new(line.strip)
+        ast = nil
+
+        # parse
+        parser = Parser.new(lexer)
+        begin
+          ast = parser.execute
+        rescue => _e
+          puts "There is a syntax error in the file.\nCouldn't parse\n  #{line}"
+          transaction_ok = false
+          break
+        end
+
+        unless ast.instance_of?(Fact) || ast.instance_of?(Rule)
+          puts "I can not store this!\n  #{line}\nis not a rule or fact!"
+          transaction_ok = false
+          break
+        end
+
+        base << ast
+      end
+
+      @knowledge_base += base if transaction_ok
 
     # unknown command
     elsif @line.start_with?(':')
@@ -108,6 +153,7 @@ class REPL
     puts ':(r)eify   to reify every variable in the given term with unique prefix'
     puts ':(o)ccurs  to enable/disable strict occurs checking'
     puts ':(e)xport  to export current knowledge base into the .pl file'
+    puts ':(i)mport  to import existing knwoledge base from the file'
     puts ':(q)uit    to quit the repl'
     puts ''
     while true
