@@ -1,5 +1,6 @@
 #frozen_string_literal: true
 
+require 'set'
 require_relative './context'
 
 def prove(term, base, context)
@@ -54,9 +55,13 @@ def unify(left, right, base, context)
   # unify fresh var and one in Assoc
   # one side
   elsif context.fresh?(left) && context.assocd?(right)
+    return [] if context[right].occurs([left].to_set)
+
     return [context.assoc2fusassociate(right, left)]
   # oposite side
   elsif context.fresh?(right) && context.assocd?(left)
+    return [] if context[left].occurs([right].to_set)
+
     return [context.assoc2fusassociate(left, right)]
 
   # unify fresh var and one fused
@@ -70,25 +75,37 @@ def unify(left, right, base, context)
   # unify fresh var and fusasscd one
   # one side
   elsif context.fresh?(left) && context.fusassocd?(right)
+    return [] if context[right].occurs([left].to_set)
+
     return [context.add2fusassoc(right, left)]
   # opposite side
   elsif context.fresh?(right) && context.fusassocd?(left)
+    return [] if context[left].occurs([right].to_set)
+
     return [context.add2fusassoc(left, right)]
 
   # unify a fresh var and non var value
   # one side
   elsif context.fresh?(left) && !right.instance_of?(Var)
+    return [] if right.occurs([left].to_set)
+
     return [context.associate(left, right)]
   # opposite side
   elsif context.fresh?(right) && !left.instance_of?(Var)
+    return [] if left.occurs([right].to_set)
+
     return [context.associate(right, left)]
 
   # unify a variable associated and a variable fused
   # one side
   elsif context.assocd?(left) && context.fused?(right)
+    return [] if context[left].occurs(context.get(right).set)
+
     return [context.assoc_plus_fused(left, right)]
   # opposite side
   elsif context.assocd?(right) && context.fused?(left)
+    return [] if context[right].occurs(context.get(left).set)
+
     return [context.assoc_plus_fused(right, left)]
 
   # unify two fused variables
@@ -98,31 +115,59 @@ def unify(left, right, base, context)
   # unify fused variable with a non var value
   # one side
   elsif context.fused?(left) && !right.instance_of?(Var)
+    return [] if right.occurs(context.get(left).set)
+
     return [context.fusassociate(left, right)]
   # other side
   elsif context.fused?(right) && !left.instance_of?(Var)
+    return [] if left.occurs(context.get(right).set)
+
     return [context.fusassociate(right, left)]
 
   # unify a variable associated with a value and another value
   # one side
   elsif context.assocd?(left) && !right.instance_of?(Var)
+    return [] if right.occurs([context.get(left).var].to_set)
+
     left_val = context[left]
     return unify(left_val, right, base, context)
   # other side
   elsif context.assocd?(right) && !left.instance_of?(Var)
+    return [] if left.occurs([context.get(right).var].to_set)
+
     right_val = context[right]
     return unify(left, right_val, base, context)
 
   # unify a variable associated with a value and another one associated with value
   # unify a variable associated with a value and another one fusassciated with a value
-  # unify variables fusassociated and associated with some values
+  # unify variables fusassociated and associated with some values -- ^^^ the same thing
   # unify two fusassociated variables
   elsif (context.assocd?(left) && context.assocd?(right)) ||
         (context.assocd?(left) && context.fusassocd?(right)) ||
         (context.assocd?(right) && context.fusassocd?(left)) ||
-        (context.fusassocd?(left) && context.assocd?(right)) ||
-        (context.fusassocd?(right) && context.assocd?(left)) ||
+        # (context.fusassocd?(left) && context.assocd?(right)) ||
+        # (context.fusassocd?(right) && context.assocd?(left)) ||
         (context.fusassocd?(left) && context.fusassocd?(right))
+
+    # unify a variable associated with a value and another one associated with value
+    return [] if (context.assocd?(left) && context.assocd?(right)) ||
+                 context[left].occurs([context.get(right).var].to_set) ||
+                 context[right].occurs([context.get(left).var].to_set)
+
+    # unify a variable associated with a value and another one fusassciated with a value
+    return [] if (context.assocd?(left) && context.fusassocd?(right)) ||
+                 context[left].occurs(context.get(right).set) ||
+                 context[right].occurs([context.get(left).var].to_set)
+    # other side
+    return [] if (context.assocd?(right) && context.fusassocd?(left)) ||
+                 context[right].occurs(context.get(left).set) ||
+                 context[left].occurs([context.get(right).var].to_set)
+
+    # unify two fusassociated variables
+    return [] if (context.fusassocd?(left) && context.fusassocd?(right)) ||
+                 context[left].occurs(context.get(right).set) ||
+                 context[right].occurs(context.get(left).set)
+
     left_val = context[left]
     right_val = context[right]
     return unify(left_val, right_val, base, context)
@@ -130,18 +175,26 @@ def unify(left, right, base, context)
   # unify a fused variable with a fusassoced variable
   # one side
   elsif context.fused?(left) && context.fusassocd?(right)
+    return [] if context[right].occurs(context.get(left).set)
+
     return [context.fused_plus_fusassocd(left, right)]
   # other side
   elsif context.fused?(right) && context.fusassocd?(left)
+    return [] if context[left].occurs(context.get(right).set)
+
     return [context.fused_plus_fusassocd(right, left)]
 
   # unify a variable fusassociated with a value and another value
   # one side
   elsif context.fusassocd?(left) && !right.instance_of?(Var)
+    return [] if right.occurs(context.get(left).set)
+
     left_val = context[left]
     return unify(left_val, right, base, context)
   # other side
   elsif context.fusassocd?(right) && !left.instance_of?(Var)
+    return [] if left.occurs(context.get(right).set)
+
     right_val = context[right]
     return unify(left, right_val, base, context)
 
