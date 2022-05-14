@@ -91,105 +91,113 @@ class Context
 
   # this method does not test either of arguments for correct type
   def associate(var, val)
-    @arr.push(Assoc.new(var, val))
-    self
+    duplicate = dup
+    duplicate.arr.push(Assoc.new(var, val))
+    duplicate
   end
 
   def fuse(var_l, var_r)
     # find the position in the array
     # if there's no fusion already -> create one
     # if there is -> add both to the fusion
-    el = @arr.find { |bind| bind.is_a?(Fused) && (bind.set.include?(var_l) || bind.set.include?(var_r)) }
+    duplicate = dup
+    el = duplicate.arr.find { |bind| bind.is_a?(Fused) && (bind.set.include?(var_l) || bind.set.include?(var_r)) }
     if el.nil?
-      @arr.push(Fused.new([var_l, var_r]))
+      duplicate.arr.push(Fused.new([var_l, var_r]))
     else
       el.set.add(var_l)
       el.set.add(var_r)
     end
-    self
+    duplicate
   end
 
   def fusassociate(var_fuse, val)
     # var_fused must be in the correct binding in the context
     # val must be an atom/literal/functor
-    fused = get(var_fuse)
+    duplicate = dup
+    fused = duplicate.get(var_fuse)
 
     fusassoc = Fusassoc.new(fused.set, val)
-    remove(fused)
-    @arr.push(fusassoc)
-    self
+    duplicate.remove(fused)
+    duplicate.arr.push(fusassoc)
+    duplicate
   end
 
   def add2fusassoc(var_l, var_r)
-    l_bind = get(var_l)
+    duplicate = dup
+    l_bind = duplicate.get(var_l)
     case l_bind
     when Fusassoc
       l_bind.set.add(var_r)
     else
-      r_bind = get(var_r)
+      r_bind = duplicate.get(var_r)
       case r_bind
       when Fusassoc
         r_bind.set.add(var_l)
       end
     end
-    self
+    duplicate
   end
 
   def assoc2fusassociate(var_l, var_r)
     # finds the one in Assoc and creates Fusassoc + removes the Assoc
-    l_bind = get(var_l)
+    duplicate = dup
+    l_bind = duplicate.get(var_l)
     case l_bind
     when Assoc
-      @arr.push(Fusassoc.new([var_l, var_r], l_bind.val))
-      remove(l_bind)
+      duplicate.arr.push(Fusassoc.new([var_l, var_r], l_bind.val))
+      duplicate.remove(l_bind)
     else
-      r_bind = get(var_r)
+      r_bind = duplicate.get(var_r)
       case r_bind
       when Assoc
-        @arr.push(Fusassoc.new([var_l, var_r], r_bind.val))
-        remove(r_bind)
+        duplicate.arr.push(Fusassoc.new([var_l, var_r], r_bind.val))
+        duplicate.remove(r_bind)
       end
     end
 
-    self
+    duplicate
   end
 
   # merges an Assoc and a Fused together into a Fusassoc
   def assoc_plus_fused(var_assoc, var_fused)
     # the order must be adhered to
     # and both vars must be in the correct binding in the Context
-    assoc_bind = get(var_assoc)
-    fusion_bind = get(var_fused)
+    duplicate = dup
+    assoc_bind = duplicate.get(var_assoc)
+    fusion_bind = duplicate.get(var_fused)
 
     fusassoc = Fusassoc.new(fusion_bind.set.add(var_assoc), assoc_bind.val)
-    remove(assoc_bind)
-    remove(fusion_bind)
-    @arr.push(fusassoc)
-    self
+    duplicate.remove(assoc_bind)
+    duplicate.remove(fusion_bind)
+    duplicate.arr.push(fusassoc)
+    duplicate
   end
 
   # adds all the vars in the Fused into the Fusassoc
   def fused_plus_fusassocd(var_fused, var_fusassocd)
     # both vars must be in the correct bindings in the Context
-    fused = get(var_fused)
-    fusassocd = get(var_fusassocd)
+    duplicate = dup
+    fused = duplicate.get(var_fused)
+    fusassocd = duplicate.get(var_fusassocd)
 
     fusassocd.set.merge(fused.set)
-    remove(fused)
-    self
+    duplicate.remove(fused)
+    duplicate
   end
 
   # merges two Fused together
   def merge_fused(var_left, var_right)
     # both vars must be in the correct binding in the Context
-    left_bind = get(var_left)
-    right_bind = get(var_right)
+    duplicate = dup
+    left_bind = duplicate.get(var_left)
+    right_bind = duplicate.get(var_right)
 
     merged = left_bind.set.merge(right_bind.set)
-    remove(left_bind)
-    remove(right_bind)
-    @arr.push(Fused.new(merged))
-    self
+    duplicate.remove(left_bind)
+    duplicate.remove(right_bind)
+    duplicate.arr.push(Fused.new(merged))
+    duplicate
   end
 
   # if the var argument is not a Variable or a fresh one -> nil
@@ -274,8 +282,9 @@ class Context
 
   # removes given binding (Assoc, Fused, Fusassoc) from the Context
   def remove(bind)
-    @arr = @arr.filter { |b| b != bind }
-    self
+    duplicate = dup
+    duplicate.arr = duplicate.arr.filter { |b| b != bind }
+    duplicate
   end
 
   def to_s
