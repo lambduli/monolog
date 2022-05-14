@@ -2,7 +2,6 @@
 
 require 'set'
 
-require_relative '../context'
 require_relative './ast'
 
 # general Functor term

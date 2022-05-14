@@ -2,7 +2,7 @@
 
 require 'set'
 
-require_relative '../context'
+require_relative '../context/bind'
 require_relative './ast'
 
 # variables
