@@ -18,7 +18,7 @@ class Parser
   def execute
     r = first_of(
       [method(:parse_rule),
-       method(:parse_rule_body), # conjuction, term, or disjunction in the future
+       method(:parse_sentence), # conjuction, term, or disjunction in the future
        method(:parse_variable),
        method(:parse_literal),
        method(:parse_atom)],
@@ -86,7 +86,7 @@ class Parser
 
     if tok.instance_of? If
       begin
-        b = parse_rule_body
+        b = parse_sentence
         return Rule.new(f.name, f.arguments, b)
       rescue => _e
         raise 'not a rule - failed to parse the body of the definition'
@@ -96,7 +96,7 @@ class Parser
     raise 'not a rule or fact - missing either . or :-'
   end
 
-  def parse_rule_body
+  def parse_sentence
     # it also parses the dot at the end
 
     term = nil
