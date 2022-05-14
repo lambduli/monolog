@@ -434,6 +434,6 @@ class Disjunction < AST
   end
 
   def ==(other)
-    other.instance_of?(Conjunction) && @left == other.left && @right == other.right
+    other.instance_of?(Disjunction) && @left == other.left && @right == other.right
   end
 end

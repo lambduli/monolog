@@ -122,6 +122,26 @@ class Evaluator
         #   cs = prove(term.right, base, ctx)
         #   list.concat(cs)
         # end
+
+      when Disjunction
+        # v pripade ze dokazuju disjunkci
+        # nejdriv zkusim dokazat left a pak nezavisle na tom zkusim dokazat right
+        # to znamena:
+        # tocim left tak dlouho dokud neco pada
+        # kdyz padat prestane, jdu tocit right tak dloho dokud neco pada
+        # kdyz prestane padat right -> unifal
+        delegate(prove(term.left, base, context))
+        transparent(prove(term.right, base, context))
+
+        # left_fiber = prove(term.left, base, context)
+        # while true
+        #   result_left = left_fiber.resume
+        #   case result_left
+        #   when UnificationFailure
+        #     unifail
+        #   when Context
+
+
       else
         # iterate base and try to unify term with each member of the base
         # tohle uz je vetsinou popsany uplne nahore

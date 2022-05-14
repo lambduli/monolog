@@ -194,13 +194,16 @@ class REPL
   def present(context, var_names)
     vars = var_names.map { |name| Var.new(name) }
     var_set = vars.to_set
-    var_names.each do |var|
-      val = Var.new(var).specify(context, var_set)
+    var_names.each do |varname|
+      var = Var.new(varname)
+      next if context.fresh?(var)
+
+      val = var.specify(context, var_set)
       case val
       when Var
         next unless var_set.include?(val)
       end
-      puts "  #{var} = #{Var.new(var).specify(context, var_set)}"
+      puts "  #{varname} = #{var.specify(context, var_set)}"
     end
     var_set.length
   end
