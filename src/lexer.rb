@@ -33,7 +33,7 @@ class Lexer
       @col += 1
       next_token
     when '_'
-      r = Hole.new(@row, @col)
+      r = Underscore.new(@row, @col)
       @col += 1
       r
     when '('

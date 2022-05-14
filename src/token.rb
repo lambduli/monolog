@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
+# abstract predecessor of all tokens
 class Token
-
 end
 
-
-# x
+# x...
 class Lower_Identifier < Token
   attr_accessor :str, :row, :column
 
@@ -16,8 +15,7 @@ class Lower_Identifier < Token
   end
 end
 
-
-# X
+# X...
 class Upper_Identifier < Token
   attr_accessor :str, :row, :column
 
@@ -27,7 +25,6 @@ class Upper_Identifier < Token
     @column = column
   end
 end
-
 
 # [
 class Open_Bracket < Token
@@ -39,7 +36,6 @@ class Open_Bracket < Token
   end
 end
 
-
 # ]
 class Close_Bracket < Token
   attr_accessor :row, :column
@@ -49,7 +45,6 @@ class Close_Bracket < Token
     @column = column
   end
 end
-
 
 # (
 class Open_Paren < Token
@@ -61,7 +56,6 @@ class Open_Paren < Token
   end
 end
 
-
 # )
 class Close_Paren < Token
   attr_accessor :row, :column
@@ -71,7 +65,6 @@ class Close_Paren < Token
     @column = column
   end
 end
-
 
 # ,
 class Comma < Token
@@ -83,7 +76,6 @@ class Comma < Token
   end
 end
 
-
 # ;
 class Semicolon < Token
   attr_accessor :row, :column
@@ -93,7 +85,6 @@ class Semicolon < Token
     @column = column
   end
 end
-
 
 # .
 class Dot < Token
@@ -105,17 +96,15 @@ class Dot < Token
   end
 end
 
-
 # |
 class Cons < Token
   attr_accessor :row, :column
-  
+
   def initialize(row, column)
     @row = row
     @column = column
   end
 end
-
 
 # + * / -
 class Operator < Token
@@ -128,7 +117,6 @@ class Operator < Token
   end
 end
 
-
 # is
 class Is < Token
   attr_accessor :row, :column
@@ -139,7 +127,6 @@ class Is < Token
   end
 end
 
-
 # :-
 class If < Token
   attr_accessor :row, :column
@@ -149,7 +136,6 @@ class If < Token
     @column = column
   end
 end
-
 
 # 123
 class Numeral < Token
@@ -162,7 +148,6 @@ class Numeral < Token
   end
 end
 
-
 # "text"
 class Text < Token
   attr_accessor :value, :row, :column
@@ -174,9 +159,8 @@ class Text < Token
   end
 end
 
-
 # _
-class Hole < Token
+class Underscore < Token
   attr_accessor :row, :column
 
   def initialize(row, column)
