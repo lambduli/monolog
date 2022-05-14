@@ -55,8 +55,7 @@ class Functor < AST
 
   def rename(mapping)
     renamed_args = @arguments.map { |arg| arg.rename(mapping) }
-    dup_with(@name, renamed_args)
-    # TODO: it seems I only call dup_with with first argument being the same @name, so maybe I should drop it
+    dup_with(renamed_args)
   end
 
   def occurs(var_set, context)
@@ -78,8 +77,8 @@ class Fact < Functor
     "#{@name}(#{@arguments.join(', ')})."
   end
 
-  def dup_with(name, args)
-    Fact.new(name, args)
+  def dup_with(args)
+    Fact.new(@name, args)
   end
 
   def dup
@@ -332,8 +331,8 @@ class Predicate < Functor
     "#{@name}(#{@arguments.join(', ')})"
   end
 
-  def dup_with(name, args)
-    Predicate.new(name, args)
+  def dup_with(args)
+    Predicate.new(@name, args)
   end
 
   def dup
@@ -359,7 +358,7 @@ class Cons < Predicate
     "[#{@arguments[0]} | #{@arguments[1]}]"
   end
 
-  def dup_with(_name, args)
+  def dup_with(args)
     Cons.new(*args)
   end
 
@@ -386,7 +385,7 @@ class Nil < Predicate
     '[]'
   end
 
-  def dup_with(_name, _args)
+  def dup_with(_args)
     Nil.new
   end
 
