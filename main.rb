@@ -95,7 +95,6 @@ class REPL
     puts ':(o)ccurs  to enable/disable strict occurs checking'
     puts ':(q)uit    to quit the repl'
     puts ''
-    # input = 'isSmall(X, _, small(some(atom, [1 | T]))) :- someMagic(X, V), E is [2 | 3 | [23]] ; other(V, E).'
     while true
       # Read
       @line = Readline.readline(prompt, true)
@@ -137,13 +136,7 @@ class REPL
         ast = Predicate.new(ast.name, ast.arguments) if ast.instance_of? Fact
         @mode = :backtracking
 
-        # contexts = prove(ast, @knowledge_base, Context.new)
         fiber = @evaluator.prove(ast, @knowledge_base, Context.new)
-        # ted je potreba ten fiber resumovat tak dlouho, dokud nevrati UnificationFail/False
-        # kdykoliv vrati context -> vyprezentuju ten context uzivateli
-        #     a cekam jestli uzivatel vlozi prikaz :next nebo :done
-        #     na :next pokracuju, na :done skoncim
-        # jakmile vrati False -> vypisu False. a skoncim
 
         puts "\n"
         vars = ast.vars
@@ -169,22 +162,12 @@ class REPL
 
             puts "\nor\n\n"
           else
-            # puts unif_result.to_s
             puts "  False.\n\n"
             break
           end
         end
         @mode = :check
 
-        # vars = ast.vars
-        # puts "\n"
-        # contexts.each do |ctxt|
-        #   lines = present(ctxt, vars)
-        #   puts '  True' if lines.zero?
-
-        #   puts "\nor\n\n"
-        # end
-        # puts "  False.\n\n"
       else
         puts 'Unknown mode!'
       end
