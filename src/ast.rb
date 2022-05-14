@@ -56,6 +56,7 @@ class Functor < AST
   def rename(mapping)
     renamed_args = @arguments.map { |arg| arg.rename(mapping) }
     dup_with(@name, renamed_args)
+    # TODO: it seems I only call dup_with with first argument being the same @name, so maybe I should drop it
   end
 
   def occurs(var_set, context)
@@ -345,6 +346,60 @@ class Predicate < Functor
 
   def specify(context, user_vars)
     Predicate.new(@name, @arguments.map { |arg| arg.specify(context, user_vars) })
+  end
+end
+
+# represents a list cell [head | tail]
+class Cons < Predicate
+  def initialize(head, tail)
+    super('Cons', [head, tail])
+  end
+
+  def to_s
+    "[#{@arguments[0]} | #{@arguments[1]}]"
+  end
+
+  def dup_with(_name, args)
+    Cons.new(*args)
+  end
+
+  def dup
+    Cons.new(*@arguments.map{ |arg| arg.dup })
+  end
+
+  def ==(other)
+    other.instance_of?(Cons) && @arguments == other.arguments
+  end
+
+  def specify(context, user_vars)
+    Cons.new(*@arguments.map { |arg| arg.specify(context, user_vars) })
+  end
+end
+
+# represents an empty list cell []
+class Nil < Predicate
+  def initialize
+    super('Nil', [])
+  end
+
+  def to_s
+    '[]'
+  end
+
+  def dup_with(_name, _args)
+    Nil.new
+  end
+
+  def dup
+    Nil.new
+  end
+
+  def ==(other)
+    other.instance_of?(Nil)
+  end
+
+  def specify(_context, _user_vars)
+    Nil.new
   end
 end
 

@@ -169,6 +169,32 @@ class Parser
     )
   end
 
+  def parse_list
+    tok = @lexer.next_token
+
+    if tok.instance_of?(Open_Bracket)
+      try_parse do
+        tok = @lexer.next_token
+        return Nil.new if tok.instance_of?(Close_Bracket)
+
+        raise 'not an empty list'
+      end
+
+      head = parse_pattern
+      tok = @lexer.next_token
+      raise 'expected a |' unless tok.instance_of?(Pipe)
+
+      tail = parse_pattern
+      tok = @lexer.next_token
+
+      raise 'expected a ]' unless tok.instance_of?(Close_Bracket)
+
+      return Cons.new(head, tail)
+    end
+
+    raise 'not a list pattern'
+  end
+
   def parse_wild
     tok = @lexer.next_token
 
@@ -212,7 +238,8 @@ class Parser
 
   def parse_pattern
     first_of(
-      [method(:parse_predicate),
+      [method(:parse_list),
+       method(:parse_predicate),
        method(:parse_wild),
        method(:parse_atom),
        method(:parse_literal),
