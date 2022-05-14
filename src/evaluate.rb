@@ -66,6 +66,12 @@ class Evaluator
     end
   end
 
+  # helper function to resume the fiber and return the result
+  # it's just so I don't need to do unify(...).resume
+  def unwrap(fiber)
+    fiber.resume
+  end
+
   # returns a Fiber which on `resume` yields either Context or UnificationFailure object
   # once it yields UnificationFailure it should never be resumed again
   # it's fine to resume it after it yielded Context
@@ -315,7 +321,7 @@ class Evaluator
         to_unify = left.arguments.zip(right.arguments)
 
         to_unify.each do |l, r|
-          result = unify(l, r, base, context).resume
+          result = unwrap(unify(l, r, base, context))
           case result
           when Context
             context = result
@@ -345,7 +351,7 @@ class Evaluator
         to_unify = left.arguments.zip(right.arguments)
 
         to_unify.each do |l, r|
-          result = unify(l, r, base, context).resume
+          result = unwrap(unify(l, r, base, context))
           case result
           when Context
             context = result
