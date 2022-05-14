@@ -4,7 +4,7 @@ require 'set'
 
 require_relative './ast'
 
-# _, _
+# \+
 class Negation < AST
   attr_accessor :arg
 
