@@ -236,3 +236,21 @@ And we may also use *OR* like this:
 Of course, we may also express disjunctive relationship naturally just by defining two facts/rules in the knowledge base, but sometimes it's useful to have the expressive power to do it explicitly.
 
 > `Monolog` does not understand parentheses as of now. Both `,` and `;` have the same precedence.
+
+You can also write a rather redundant rule like this one:
+
+```prolog
+  provable(A) :- A.
+```
+
+For `provable/1` to be proven, it's argument, must be instantiated - it can not be a fresh variable. That's because any time you have standalone variable in the body of the rule like `A` here, that variable must be associated with some actual value, otherwise `Monolog` fails to unify it with anything, because it could be anything, anything at all. And that would only complicate things.
+
+So you should always do something like:
+
+```prolog
+  one(1).
+  s(z).
+  one(A) :- A.
+```
+
+Evaluating `one(1)` will then yield `True` as well as evaluating `one(s(z))`. But evaluating `one(B)` will yield just one possible result - `B = 1`.
