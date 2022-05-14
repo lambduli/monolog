@@ -243,9 +243,10 @@ You can also write a rather redundant rule like this one:
   provable(A) :- A.
 ```
 
-For `provable/1` to be proven, it's argument, must be instantiated - it can not be a fresh variable. That's because any time you have standalone variable in the body of the rule like `A` here, that variable must be associated with some actual value, otherwise `Monolog` fails to unify it with anything, because it could be anything, anything at all. And that would only complicate things.
+For `provable/1` to be proven, it's argument, needs not to be instantiated. But if you try to prove fresh variable - it will succeed once not narrowing anything.
 
-So you should always do something like:
+It only succeeds once because otherwise it would act as a "black hole" for the backtracking - once you would get to that point you wouldn't be able to leave it. Idea behind that is, that fresh variable could be anything, so `Monolog` could unify that variable with anything and everything and that would only complicate things.
+
 
 ```prolog
   one(1).
