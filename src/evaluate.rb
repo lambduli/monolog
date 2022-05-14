@@ -3,6 +3,7 @@
 require 'set'
 require 'fiber'
 require_relative './context/context'
+require_relative './ast/var'
 
 # represents a negative result of the Prove/Unify operation
 class UnificationFailure
@@ -62,6 +63,19 @@ class Evaluator
   def prove(term, base, context)
     Fiber.new do
       case term
+      when Var
+        # if the Var is associated with any value in the context -> try to prove the Val
+        # if not -> fail because of insufficient instantiation
+        maybe_val = context[term]
+        case maybe_val
+        when nil
+          # Reason: insufficient instantiation
+          unifail
+        else
+          val = maybe_val
+          delegate(prove(val, base, context))
+        end
+
       when Conjunction
         left_fiber = prove(term.left, base, context) # maybe dup the context?
         while true

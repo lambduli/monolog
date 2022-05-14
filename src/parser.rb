@@ -99,10 +99,11 @@ class Parser
   def parse_sentence
     # it also parses the dot at the end
 
-    term = nil
-    try_parse do
-      term = parse_predicate
-    end
+    term = first_of(
+      [method(:parse_predicate),
+       method(:parse_variable)],
+      'not a valid term'
+    )
 
     while true
       right = nil
@@ -113,7 +114,11 @@ class Parser
       if tok.instance_of?(Comma)
         # and
         try_parse do
-          right = parse_predicate
+          right = first_of(
+            [method(:parse_predicate),
+             method(:parse_variable)],
+            'not a valid term'
+          )
         end
         term = Conjunction.new(term, right)
         next
