@@ -267,5 +267,5 @@ You can use it like:
 
 Then you can ask like:
 ```prolog
-  test(isa(b))
+  test(isa(b)).
 ```
