@@ -54,6 +54,18 @@ class Evaluator
     unifail
   end
 
+  # helper function to invert the event
+  # if the resumed fiber immidiately fails --> it succeeds
+  # if the resumed fiber succeeds -> it fails
+  def invert(fiber, ctx)
+    case fiber.resume
+    when UnificationFailure
+      Fiber.yield ctx
+    else
+      unifail
+    end
+  end
+
   # returns a Fiber which on `resume` yields either Context or UnificationFailure object
   # once it yields UnificationFailure it should never be resumed again
   # it's fine to resume it after it yielded Context
@@ -101,6 +113,9 @@ class Evaluator
       when Disjunction
         delegate(prove(term.left, base, context))
         transparent(prove(term.right, base, context))
+
+      when Negation
+        invert(prove(term.arg, base, context), context)
 
       else
         # iterate base and try to unify term with each member of the base
