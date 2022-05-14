@@ -106,27 +106,6 @@ class Pipe < Token
   end
 end
 
-# + * / -
-# class Operator < Token
-#   attr_accessor :op, :row, :column
-
-#   def initialize(op, row, column)
-#     @op = op
-#     @row = row
-#     @column = column
-#   end
-# end
-
-# is
-# class Is < Token
-#   attr_accessor :row, :column
-
-#   def initialize(row, column)
-#     @row = row
-#     @column = column
-#   end
-# end
-
 # :-
 class If < Token
   attr_accessor :row, :column
