@@ -254,3 +254,18 @@ So you should always do something like:
 ```
 
 Evaluating `one(1)` will then yield `True` as well as evaluating `one(s(z))`. But evaluating `one(B)` will yield just one possible result - `B = 1`.
+
+
+Sometimes you may also want assert that something is not provable. For that you can use a `\+`.
+You can write this operator anywhere inside the rule's body (or in the query), but you can't use it inside the rule's or fact's head. Simply put - `\+` is not valid inside a pattern.
+
+You can use it like:
+```prolog
+  isa(a).
+  test(V) :- \+ V.
+```
+
+Then you can ask like:
+```prolog
+  test(isa(b))
+```
