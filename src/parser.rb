@@ -12,6 +12,7 @@ class Parser
   def execute
     r = first_of(
       [method(:parse_rule),
+       method(:parse_rule_body), # conjuction, term, or disjunction in the future
        method(:parse_variable),
        method(:parse_literal),
        method(:parse_atom)],
