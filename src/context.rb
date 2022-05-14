@@ -200,10 +200,12 @@ class Context
     bind = get(var)
 
     case bind
-    when Fused
-      nil
-    else
+    when Assoc
       bind.val
+    when Fusassoc
+      bind.val
+    else
+      nil
     end
   end
 
