@@ -132,6 +132,7 @@ We have all kinds of literals:
 - Strings like `"hello world"`
 - Numbers like `23`
 - Atoms like `peanut`
+- List literals like `[]` or `[1 | []]`
 
 Atoms are words which always start with a lower case letter.
 
