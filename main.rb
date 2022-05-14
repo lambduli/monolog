@@ -72,6 +72,20 @@ class REPL
       @mode = :store
       @should_skip = true
 
+    # export the base to the .pl file
+    elsif @line.start_with?(':export') || @line.start_with?(':e')
+      @should_skip = true
+      filename = @line.delete_prefix(':export').delete_prefix(':e').strip
+      if filename.empty?
+        puts 'You must specify a file name for the base to be exported to!'
+        return
+      end
+      # serialize and store the base
+      content = @knowledge_base.map do |member|
+        "#{member}\n"
+      end.join
+      File.open(filename, 'a') { |file| file.write(content) }
+
     # unknown command
     elsif @line.start_with?(':')
       puts 'Unknown command, please repeat.'
@@ -93,6 +107,7 @@ class REPL
     puts ':clear     to clear the whole knowledge base'
     puts ':(r)eify   to reify every variable in the given term with unique prefix'
     puts ':(o)ccurs  to enable/disable strict occurs checking'
+    puts ':(e)xport  to export current knowledge base into the .pl file'
     puts ':(q)uit    to quit the repl'
     puts ''
     while true
