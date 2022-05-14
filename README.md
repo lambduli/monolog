@@ -137,6 +137,8 @@ Atoms are words which always start with a lower case letter.
 
 We also have variables like `A` or `B`. They start with an upper case letter.
 
+When we don't care about the specific value we can use a *wildcard symbol*, written `_`. Wildcard should unify with anything.
+
 We have facts:
 ```prolog
 one(s(z)).
