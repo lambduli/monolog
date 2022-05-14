@@ -30,7 +30,7 @@ In any mode, type `:clear` and the whole knodledge base will be cleared.
 ### To check a validity of the term
 
 First switch to the checking mode by typing `:c` or `:check` and hitting enter.
-Now you can submit a term in the form of lone "predicate query" like `foo(x)` or a conjuction/disjunction of terms like `foo(x), bar(y).` respectively `foo(x); bar(y).`.
+Now you can submit a term in the form of lone "predicate query" like `foo(x).` or a conjuction/disjunction of terms like `foo(x), bar(y).` respectively `foo(x); bar(y).`.
 
 
 ### To control the flow of the evaluation
