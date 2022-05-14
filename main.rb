@@ -85,10 +85,10 @@ class REPL
   def run
     system 'clear'
     puts 'Monolog - implementation of simple logic programming language.'
-    puts 'You are in the loading mode. Write rules and facts. They will be stored to the knowledge base.'
+    puts 'You are in the storing/loading mode. Write rules and facts. They will be stored to the knowledge base.'
     puts ''
-    puts ':(c)heck   to switch to querying mode'
-    puts ':(s)tore   to switch to loading mode'
+    puts ':(c)heck   to switch to the checking/querying mode'
+    puts ':(s)tore   to switch to the storing/loading mode'
     puts ':show      to show the whole knowledge base'
     puts ':clear     to clear the whole knowledge base'
     puts ':(r)eify   to reify every variable in the given term with unique prefix'
