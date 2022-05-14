@@ -6,7 +6,7 @@ It is available within this REPL.
 
 _____
 
-To run: `$ ruby main.rb`
+To run: `$ ruby main.rb` or `./monolog`
 
 
 ## How to (work with the REPL):
