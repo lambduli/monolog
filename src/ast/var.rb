@@ -57,6 +57,16 @@ class Var < AST
     when Fusassoc
       var_set = bind.set.-([self])
       if bind.val.unsafe_occurs(var_set, context)
+
+        # late bug fix
+        # If the variable is Fusassocd with couple other vars and some value
+        # id the value itself fails the occurs check with any of those mentioned vars + the var itself
+        # it is going to be recursive and I will only report the value and won't go on to specify the value
+        val = bind.val
+        return val if val.occurs(bind.set, context)
+
+        # honestly I am now not sure about the usefulness of the following checks.
+
         inter = bind.set.&(user_vars)
         if user_vars.include?(self)
           return bind.val.specify(context, user_vars)
