@@ -12,6 +12,7 @@ end
 # general Functor term
 class Functor < AST
   attr_accessor :name, :arguments
+
   def initialize(name, arguments)
     @name = name
     @arguments = arguments
@@ -28,6 +29,7 @@ end
 # consists of predicate (head + body) and conjunction ~~or~~disjunctions~~
 class Rule < AST
   attr_accessor :name, :arguments, :body
+
   def initialize(name, arguments, body)
     @name = name
     @arguments = arguments
