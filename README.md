@@ -56,21 +56,28 @@ Now switch to the `checking mode` and try following queries.
 
 Computing the factorial of 4 using Peano numbers:
 
-`fact(s(s(s(s(z)))), R).` should produce `R = s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(z))))))))))))))))))))))))`
+`fact(s(s(s(s(z)))), R).` should produce
+
+```prolog
+  R = s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(z))))))))))))))))))))))))
+```
 
 Of course 24 of `s`'s are a bit hard to count, so maybe something bit smaller:
 
-`fact(s(s(z)), R).` should produce `R = s(s(z))`
+`fact(s(s(z)), R).` should produce
+```prolog
+  R = s(s(z))
+```
 
-Computing factorials is interesting, but it doesn't really manifest the power and beauty of the logic programming. We can try a different example, we can ask which number is the same as it's factorial.
+Computing factorials is interesting as well as important, but it doesn't really manifest the power and beauty of the logic programming. We can try a different example, we can ask which number is the same as it's factorial.
 
 `fact(A, A).`
 
-And `Monolog` will promptly answer with `A = s(z)` if we ask him politely to try and find another answer it will produce `A = s(s(z))`. That should be enough and we should instruct `Monolog` to conclude this query. There is no other number which would satisfy our condition anyway.
+And `Monolog` will promptly answer with `A = s(z)` and if we ask him politely to try and find another answer it will produce `A = s(s(z))`. That should be enough and we should instruct `Monolog` to conclude this query. There is no other number which would satisfy our condition anyway.
 
-This was quite enlightening but we can go even further, we can ask `Monolog` to find all the pairs of numbers such that they are in the `fact` relation as we defined it.
+This was, without a doubt, quite enlightening but we can go even further, we can ask `Monolog` to find all the pairs of numbers such that they are in the `fact` relation as we defined it above.
 
-`fact(A, B).` And it should feed us the following.
+We input `fact(A, B).` and it should feed us the following.
 ```prolog
   A = z
   B = s(z)
@@ -83,5 +90,36 @@ We are now free to ask for another pair from the `fact` relation and we will be 
   B = s(z)
 ```
 
-We can go on infinitely or until the search for a single answer takes longer then couple of moments, which will be roughly around factorial of the number 5 or 6 depending on your hardware, our infinity is quite small, but it's all that we got.
+We can go on infinitely or until the search for a single answer takes longer then couple of moments, which will be roughly around the factorial of the number 5 or 6 depending on your hardware. *Our infinity is quite small, but it's all that we got.*
 
+___
+
+We can also try something bit simpler like `plus(A, B, B).`
+
+This should produce
+```prolog
+  A = z
+```
+Meaning that this will be satisfied when the first number will be zero and the second number doesn't matter - it can be whatever. *But it must be a number still.*
+
+But if we ask the `Monolog` for another answer to that query something strange will happen - it will dive into the unbounded recursion and quickly consume the whole stack and cause `stack overflow exception`. This behaviour, while not unexpected, is different from what `SWIPL`, for example, does. The `SWIPL` doesn't do strict **occurs** checking by default, but `Monolog` does exactly that, so the result of that one quiery will differ between these two.
+
+Because the benevolent unification of the `SWIPL` produces some interesting results the `Monolog` does have an option to disable **strict occurs checking**. You simply input `:o` or `:occurs` and it togles the occurs setting.
+
+What that means is you can load a fact like this one.
+```prolog
+one(X, s(X)).
+```
+
+and test it, first with **strict occurs check enabled**
+```prolog
+one(A, A).
+```
+
+This should produce `False` and nothing else.
+
+But when we disable the **strict occurs checking** we will get this extra answer.
+```prolog
+  A = s(A)
+```
+This is obviously incorrect and breaks all kinds of rules, but `SWIPL` defaults to that behaviour so `Monolog` offers it too.
