@@ -37,7 +37,7 @@ end
 def unifail
   Fiber.yield UnificationFailure.new
 
-  puts 'Tohle by se nemelo nikdy stat. Nekdo resumnuj Fiber po tom co Fialnulo.'
+  # puts 'Tohle by se nemelo nikdy stat. Nekdo resumnul Fiber po tom co Fialnulo.'
 end
 
 # helper function to yield a single correct result and then yield failure
@@ -160,14 +160,14 @@ def unify(left, right, base, context)
     # unify fresh var and one in Assoc
     # one side
     elsif context.fresh?(left) && context.assocd?(right)
-      unifail if context[right].occurs([left].to_set)
+      unifail if context[right].occurs([left].to_set, context)
       # return [] if context[right].occurs([left].to_set)
 
       single(context.assoc2fusassociate(right, left))
       # return [context.assoc2fusassociate(right, left)]
     # oposite side
     elsif context.fresh?(right) && context.assocd?(left)
-      unifail if context[left].occurs([right].to_set)
+      unifail if context[left].occurs([right].to_set, context)
       # return [] if context[left].occurs([right].to_set)
 
       single(context.assoc2fusassociate(left, right))
@@ -186,14 +186,14 @@ def unify(left, right, base, context)
     # unify fresh var and fusasscd one
     # one side
     elsif context.fresh?(left) && context.fusassocd?(right)
-      unifail if context[right].occurs([left].to_set)
+      unifail if context[right].occurs([left].to_set, context)
       # return [] if context[right].occurs([left].to_set)
 
       single(context.add2fusassoc(right, left))
       # return [context.add2fusassoc(right, left)]
     # opposite side
     elsif context.fresh?(right) && context.fusassocd?(left)
-      unifail if context[left].occurs([right].to_set)
+      unifail if context[left].occurs([right].to_set, context)
       # return [] if context[left].occurs([right].to_set)
 
       single(context.add2fusassoc(left, right))
@@ -202,14 +202,14 @@ def unify(left, right, base, context)
     # unify a fresh var and non var value
     # one side
     elsif context.fresh?(left) && !right.instance_of?(Var)
-      unifail if right.occurs([left].to_set)
+      unifail if right.occurs([left].to_set, context)
       # return [] if right.occurs([left].to_set)
 
       single(context.associate(left, right))
       # return [context.associate(left, right)]
     # opposite side
     elsif context.fresh?(right) && !left.instance_of?(Var)
-      unifail if left.occurs([right].to_set)
+      unifail if left.occurs([right].to_set, context)
       # return [] if left.occurs([right].to_set)
 
       single(context.associate(right, left))
@@ -218,14 +218,14 @@ def unify(left, right, base, context)
     # unify a variable associated and a variable fused
     # one side
     elsif context.assocd?(left) && context.fused?(right)
-      unifail if context[left].occurs(context.get(right).set)
+      unifail if context[left].occurs(context.get(right).set, context)
       # return [] if context[left].occurs(context.get(right).set)
 
       single(context.assoc_plus_fused(left, right))
       # return [context.assoc_plus_fused(left, right)]
     # opposite side
     elsif context.assocd?(right) && context.fused?(left)
-      unifail if context[right].occurs(context.get(left).set)
+      unifail if context[right].occurs(context.get(left).set, context)
       # return [] if context[right].occurs(context.get(left).set)
 
       single(context.assoc_plus_fused(right, left))
@@ -239,14 +239,14 @@ def unify(left, right, base, context)
     # unify fused variable with a non var value
     # one side
     elsif context.fused?(left) && !right.instance_of?(Var)
-      unifal if right.occurs(context.get(left).set)
+      unifal if right.occurs(context.get(left).set, context)
       # return [] if right.occurs(context.get(left).set)
 
       single(context.fusassociate(left, right))
       # return [context.fusassociate(left, right)]
     # other side
     elsif context.fused?(right) && !left.instance_of?(Var)
-      unifail if left.occurs(context.get(right).set)
+      unifail if left.occurs(context.get(right).set, context)
       # return [] if left.occurs(context.get(right).set)
 
       single(context.fusassociate(right, left))
@@ -255,7 +255,7 @@ def unify(left, right, base, context)
     # unify a variable associated with a value and another value
     # one side
     elsif context.assocd?(left) && !right.instance_of?(Var)
-      unifail if right.occurs([context.get(left).var].to_set)
+      unifail if right.occurs([context.get(left).var].to_set, context)
       # return [] if right.occurs([context.get(left).var].to_set)
 
       left_val = context[left]
@@ -263,7 +263,7 @@ def unify(left, right, base, context)
       # return unify(left_val, right, base, context)
     # other side
     elsif context.assocd?(right) && !left.instance_of?(Var)
-      unifail if left.occurs([context.get(right).var].to_set)
+      unifail if left.occurs([context.get(right).var].to_set, context)
       # return [] if left.occurs([context.get(right).var].to_set)
 
       right_val = context[right]
@@ -283,22 +283,22 @@ def unify(left, right, base, context)
 
       # unify a variable associated with a value and another one associated with value
       unifail if (context.assocd?(left) && context.assocd?(right)) &&
-                  (context[left].occurs([context.get(right).var].to_set) ||
-                  context[right].occurs([context.get(left).var].to_set))
+                  (context[left].occurs([context.get(right).var].to_set, context) ||
+                  context[right].occurs([context.get(left).var].to_set, context))
 
       # unify a variable associated with a value and another one fusassciated with a value
       unifail if (context.assocd?(left) && context.fusassocd?(right)) &&
-                  (context[left].occurs(context.get(right).set) ||
-                  context[right].occurs([context.get(left).var].to_set))
+                  (context[left].occurs(context.get(right).set, context) ||
+                  context[right].occurs([context.get(left).var].to_set, context))
       # other side
       unifail if (context.assocd?(right) && context.fusassocd?(left)) &&
-                  (context[right].occurs(context.get(left).set) ||
-                  context[left].occurs([context.get(right).var].to_set))
+                  (context[right].occurs(context.get(left).set, context) ||
+                  context[left].occurs([context.get(right).var].to_set, context))
 
       # unify two fusassociated variables
       unifail if (context.fusassocd?(left) && context.fusassocd?(right)) &&
-                  (context[left].occurs(context.get(right).set) ||
-                  context[right].occurs(context.get(left).set))
+                  (context[left].occurs(context.get(right).set, context) ||
+                  context[right].occurs(context.get(left).set, context))
 
       left_val = context[left]
       right_val = context[right]
@@ -308,26 +308,26 @@ def unify(left, right, base, context)
     # unify a fused variable with a fusassoced variable
     # one side
     elsif context.fused?(left) && context.fusassocd?(right)
-      unifail if context[right].occurs(context.get(left).set)
+      unifail if context[right].occurs(context.get(left).set, context)
 
       single(context.fused_plus_fusassocd(left, right))
       # return [context.fused_plus_fusassocd(left, right)]
     # other side
     elsif context.fused?(right) && context.fusassocd?(left)
-      unifail if context[left].occurs(context.get(right).set)
+      unifail if context[left].occurs(context.get(right).set, context)
 
       single(context.fused_plus_fusassocd(right, left))
 
     # unify a variable fusassociated with a value and another value
     # one side
     elsif context.fusassocd?(left) && !right.instance_of?(Var)
-      unifail if right.occurs(context.get(left).set)
+      unifail if right.occurs(context.get(left).set, context)
 
       left_val = context[left]
       transparent(unify(left_val, right, base, context))
     # other side
     elsif context.fusassocd?(right) && !left.instance_of?(Var)
-      unifail if left.occurs(context.get(right).set)
+      unifail if left.occurs(context.get(right).set, context)
 
       right_val = context[right]
       transparent(unify(left, right_val, base, context))
