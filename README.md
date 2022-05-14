@@ -11,26 +11,26 @@ To run: `$ ruby main.rb`
 
 ## How to (work with the REPL):
 
-### To store a fact or rule in the knowledge base
+### To store a fact or a rule in the knowledge base
 
 Make sure you are in the storing mode by inputting `:s` or `:store` and hitting enter.
-Now you can insert predicates and fact one by one into the knowledge base.
+Now you can insert predicates and facts - one by one - into the knowledge base.
 
 
 ### To show the whole knowledge base
 
-In any mode input `:show` and the whole knowledge base will be printed one fact/rule per line.
+In any mode, type `:show` and the whole knowledge base will be printed one fact/rule per line.
 
 
 ### To clear the whole knowledge base
 
-In any mode input `:clear` and the whole knodledge base will be cleared.
+In any mode, type `:clear` and the whole knodledge base will be cleared.
 
 
 ### To check a validity of the term
 
-First switch to the checking mode by inputting `:c` or `:check` and hitting enter.
-Now you can submit a term in the form of lone "predicate query" like `foo(x)` or conjuction of terms like `foo(x), bar(y)`.
+First switch to the checking mode by typing `:c` or `:check` and hitting enter.
+Now you can submit a term in the form of lone "predicate query" like `foo(x)` or a conjuction/disjunction of terms like `foo(x), bar(y).` respectively `foo(x); bar(y).`.
 
 
 ### To control the flow of the evaluation
@@ -41,7 +41,7 @@ ___
 
 ## Examples
 
-You can load following fragment of the knowledge base into the REPL.
+You can load the following fragment of the knowledge base into the REPL.
 
 ```prolog
 plus(z, N, N).
@@ -69,11 +69,11 @@ Of course 24 of `s`'s are a bit hard to count, so maybe something bit smaller:
   R = s(s(z))
 ```
 
-Computing factorials is interesting as well as important, but it doesn't really manifest the power and beauty of the logic programming. We can try a different example, we can ask which number is the same as it's factorial.
+Computing factorials is interesting as well as important, but it doesn't really manifest the power and beauty of the logic programming. We can try a different example. We may ask which number is the same as it's factorial.
 
 `fact(A, A).`
 
-And `Monolog` will promptly answer with `A = s(z)` and if we ask him politely to try and find another answer it will produce `A = s(s(z))`. That should be enough and we should instruct `Monolog` to conclude this query. There is no other number which would satisfy our condition anyway.
+And `Monolog` will promptly answer with `A = s(z)` and if we ask him politely to try and find another answer, it will produce `A = s(s(z))`. That should be enough for anyone and we should instruct `Monolog` to conclude this query. There is no other number which would satisfy our condition anyway.
 
 This was, without a doubt, quite enlightening but we can go even further, we can ask `Monolog` to find all the pairs of numbers such that they are in the `fact` relation as we defined it above.
 
@@ -122,7 +122,7 @@ But when we disable the **strict occurs checking** we will get this extra answer
 ```prolog
   A = s(A)
 ```
-This is obviously incorrect and breaks all kinds of rules, but `SWIPL` defaults to that behaviour so `Monolog` offers it too. So should you enjoy your answers incorrect and recursive, `Monolog` got you covered.
+This is obviously incorrect and breaks all kinds of rules, but `SWIPL` defaults to that behaviour so `Monolog` offers it too. So should you enjoy your answers incorrect and recursive, `Monolog`'s got you covered.
 
 ____
 
