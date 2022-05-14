@@ -81,8 +81,11 @@ class Evaluator
         maybe_val = context[term]
         case maybe_val
         when nil
+          # instead of failing, I am gonna say that fresh variable is provable
+          # but only in single model
+          single(context)
           # Reason: insufficient instantiation
-          unifail
+          # unifail
         else
           val = maybe_val
           delegate(prove(val, base, context))
@@ -239,7 +242,7 @@ class Evaluator
       # unify two fusassociated variables
       elsif (context.assocd?(left) && context.assocd?(right)) ||
             (context.assocd?(left) && context.fusassocd?(right)) ||
-            (context.assocd?(right) && context.fusassocd?(left)) ||
+            (context.fusassocd?(left) && context.assocd?(right)) ||
             (context.fusassocd?(left) && context.fusassocd?(right))
 
         # unify a variable associated with a value and another one associated with value
