@@ -150,23 +150,23 @@ def unify(left, right, base, context)
         (context.fusassocd?(left) && context.fusassocd?(right))
 
     # unify a variable associated with a value and another one associated with value
-    return [] if (context.assocd?(left) && context.assocd?(right)) ||
-                 context[left].occurs([context.get(right).var].to_set) ||
-                 context[right].occurs([context.get(left).var].to_set)
+    return [] if (context.assocd?(left) && context.assocd?(right)) &&
+                 (context[left].occurs([context.get(right).var].to_set) ||
+                 context[right].occurs([context.get(left).var].to_set))
 
     # unify a variable associated with a value and another one fusassciated with a value
-    return [] if (context.assocd?(left) && context.fusassocd?(right)) ||
-                 context[left].occurs(context.get(right).set) ||
-                 context[right].occurs([context.get(left).var].to_set)
+    return [] if (context.assocd?(left) && context.fusassocd?(right)) &&
+                 (context[left].occurs(context.get(right).set) ||
+                 context[right].occurs([context.get(left).var].to_set))
     # other side
-    return [] if (context.assocd?(right) && context.fusassocd?(left)) ||
-                 context[right].occurs(context.get(left).set) ||
-                 context[left].occurs([context.get(right).var].to_set)
+    return [] if (context.assocd?(right) && context.fusassocd?(left)) &&
+                 (context[right].occurs(context.get(left).set) ||
+                 context[left].occurs([context.get(right).var].to_set))
 
     # unify two fusassociated variables
-    return [] if (context.fusassocd?(left) && context.fusassocd?(right)) ||
-                 context[left].occurs(context.get(right).set) ||
-                 context[right].occurs(context.get(left).set)
+    return [] if (context.fusassocd?(left) && context.fusassocd?(right)) &&
+                 (context[left].occurs(context.get(right).set) ||
+                 context[right].occurs(context.get(left).set))
 
     left_val = context[left]
     right_val = context[right]
