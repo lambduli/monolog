@@ -1,6 +1,6 @@
 # Monolog
 
-Monolog is a simple logic programming language. It's syntax is a subset of the Prolog.
+Monolog is a simple logic programming language. Its syntax is a subset of the Prolog.
 
 It is available within this REPL.
 
@@ -90,7 +90,7 @@ We are now free to ask for another pair from the `fact` relation and we will be 
   B = s(z)
 ```
 
-We can go on infinitely or until the search for a single answer takes longer then couple of moments, which will be roughly around the factorial of the number 5 or 6 depending on your hardware. *Our infinity is quite small, but it's all that we got.*
+We can go on infinitely or until the search for a single answer takes longer then couple of moments, which will be roughly around the factorial of the number 5 or 6 depending on your hardware. *Our infinity is quite small, but it's all we got.*
 
 ___
 
@@ -104,7 +104,7 @@ Meaning that this will be satisfied when the first number will be zero and the s
 
 But if we ask the `Monolog` for another answer to that query something strange will happen - it will dive into the unbounded recursion and quickly consume the whole stack and cause `stack overflow exception`. This behaviour, while not unexpected, is different from what `SWIPL`, for example, does. The `SWIPL` doesn't do strict **occurs** checking by default, but `Monolog` does exactly that, so the result of that one quiery will differ between these two.
 
-Because the benevolent unification of the `SWIPL` produces some interesting results the `Monolog` does have an option to disable **strict occurs checking**. You simply input `:o` or `:occurs` and it togles the occurs setting.
+Because of the benevolent unification, the `SWIPL` produces some interesting results. So the `Monolog` does have an option to disable **strict occurs checking**. You simply input `:o` or `:occurs` and it togles the occurs setting.
 
 What that means is you can load a fact like this one.
 ```prolog
