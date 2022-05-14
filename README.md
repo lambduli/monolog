@@ -156,10 +156,80 @@ Here `even` is a rule. It has a **head** which is the name and list of arguments
 For the rule to unify with a term they must have the same name, same number of arguments, arguments must unify with patterns in corresponding positions and a body must unify within the same context.
 
 
-To express that something should be true **AND** some other thing should be true also, we need to use the `conjunction`. Conjunction is written as `,` in the `Monolog` *same as in Prolog*. So we can do something like:
+To express that something should be true **AND** some other thing should be true also, we need to use the `conjunction`. Conjunction is written as `,` in the `Monolog` *same as in the Prolog*. So we can do something like:
 ```prolog
 longAndBlue(A) :- long(A), blue(A).
 ```
-Assuming we define `long/1` and `blue/1` we can make something out of it.
 
-> Name of the predicate followed by the slash and a number is a convention in the Prolog to refer to that definition of the predicate of the given name, which has *that many* arguments.
+You can also express that something **OR** the other thing should be true. For that you can use explicit `disjunction`.
+Disjunction is written as `;` in the `Monolog` *again same as in the Prolog*. So we can write something like:
+```prolog
+longOrBlue(A) :- long(A) ; blue(A).
+```
+
+Assuming we defined `long/1` and `blue/1`.
+
+> Name of the predicate followed by the slash and a number is a convention in the Prolog to refer to that definition of the predicate of the given name, which accepts *that many* arguments.
+
+So if we insert this fragment of the knowledge base:
+```prolog
+foo(a).
+foo(b).
+bar(x).
+bar(y).
+```
+
+We may use *AND* like this:
+```prolog
+  ?- foo(V), bar(W).
+
+    V = a
+    W = x
+
+  @- :n
+
+    V = a
+    W = y
+
+  @- :n
+
+    V = b
+    W = x
+
+  @- :n
+
+    V = b
+    W = y
+
+  @- :n
+
+    False.
+```
+
+And we may also use *OR* like this:
+```prolog
+  ?- foo(V) ; bar(W).
+
+    V = a
+
+  @- :n
+
+    V = b
+
+  @- :n
+
+    W = x
+
+  @- :n
+
+    W = y
+
+  @- :n
+
+    False.
+```
+
+
+Of course, we may also express disjunctive relationship naturally just by defining two facts/rules in the knowledge base, but sometimes it's useful to have the expressive power to do it explicitly.
+
+> `Monolog` does not understand parentheses as of now. Both `,` and `;` have the same precedence.
