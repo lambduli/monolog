@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'set'
+
 require_relative './context'
 
 # general AST
@@ -32,6 +34,10 @@ class AST
   def occurs(_var_set, _context)
     false
   end
+
+  def unsafe_occurs(_var_set, _context)
+    false
+  end
 end
 
 # general Functor term
@@ -55,6 +61,12 @@ class Functor < AST
   def occurs(var_set, context)
     @arguments.any? do |arg|
       arg.occurs(var_set, context)
+    end
+  end
+
+  def unsafe_occurs(var_set, context)
+    @arguments.any? do |arg|
+      arg.unsafe_occurs(var_set, context)
     end
   end
 end
@@ -225,8 +237,33 @@ class Var < AST
 
     case bind
     when Assoc
+      # Because the Monolog language doesn't contain explicit unification operator =
+      # it shouldn't be possible to fail the occurs check with just a variable associated with a value containing itself
+      # so I don't expect to need to take care of that matter when presenting/specifying the content of user variables
+
       bind.val.specify(context, user_vars)
     when Fusassoc
+      # puts "check occurs for #{self}   con #{context}   "
+      var_set = bind.set.-([self])
+      if bind.val.unsafe_occurs(var_set, context)
+        # puts "occurs check failed for #{self}   within #{context}   user_vars #{user_vars}"
+        # puts "inter   #{bind.set.&(user_vars)}"
+        # puts "maybe_bind.set.&(var_set.-([self]))"
+        # puts "#{context.get(self).set.&(var_set.-([self]))}"
+        # puts "context self set   #{context.get(self).set}"
+        # puts "a ta druha cast pruniku   #{(var_set.-([self]))}"
+
+        inter = bind.set.&(user_vars)
+        if user_vars.include?(self)
+          # puts "self #{self} je uvnitr user_vars #{user_vars}    within #{context}"
+          return bind.val.specify(context, user_vars)
+        elsif inter.empty?
+          return self
+        else
+          return inter.to_a[0]
+        end
+      end
+
       bind.val.specify(context, user_vars)
     when Fused
       Var.new("_100#{bind.set.to_a[0].name.delete_prefix('_')}")
@@ -267,6 +304,34 @@ class Var < AST
     else
       val = maybe_val
       val.occurs(var_set, context)
+    end
+  end
+
+  # This method should only be used during specification of the term!
+  # occurs will can be used in unsafe way
+  # doing the occurs check while the context does already fails occurs check itself
+  # I expect occurs check to fail only around Fusassoc
+  def unsafe_occurs(var_set, context)
+    return true if var_set.include?(self)
+
+    maybe_bind = context.get(self)
+
+    case maybe_bind
+    when Fusassoc
+      return true unless maybe_bind.set.&(var_set.-([self])).empty?
+
+      val = maybe_bind.val
+      val.unsafe_occurs(var_set, context)
+    when nil
+      false
+    when Fused
+      false
+    else
+      # Because the Monolog language doesn't contain explicit unification operator =
+      # it shouldn't be possible to fail the occurs check with just a variable associated with a value containing itself
+      # so I don't expect to need to take care of that matter when presenting/specifying the content of user variables
+      val = maybe_bind.val
+      val.unsafe_occurs(var_set, context)
     end
   end
 end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'readline'
+require 'set'
 
 require_relative './src/token'
 require_relative './src/ast'
@@ -35,7 +36,7 @@ class REPL
   end
 
   def process_commands
-    if @line.start_with?(':quit') || @line.start_with?(':q')
+    if @line.start_with?(':quit') || @line.start_with?(':q') || @line.start_with?(':Q')
       @should_quit = true
 
     elsif @line.start_with?(':o') || @line.start_with?(':occurs')
@@ -190,8 +191,15 @@ class REPL
     end
   end
 
-  def present(context, var_set)
-    var_set.each do |var|
+  def present(context, var_names)
+    vars = var_names.map { |name| Var.new(name) }
+    var_set = vars.to_set
+    var_names.each do |var|
+      val = Var.new(var).specify(context, var_set)
+      case val
+      when Var
+        next unless var_set.include?(val)
+      end
       puts "  #{var} = #{Var.new(var).specify(context, var_set)}"
     end
     var_set.length
